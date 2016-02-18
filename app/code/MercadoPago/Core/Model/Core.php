@@ -32,25 +32,36 @@ class Core
      */
     protected $_coreHelper;
 
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $_scopeConfig;
-
     protected $_orderFactory;
+
+    /**
+     * @var \MercadoPago\Core\Helper\Message\MessageInterface
+     */
+    protected $_statusMessage;
+    protected $_statusDetailMessage;
 
 
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \MercadoPago\Core\Helper\Data $coreHelper,
-        \Magento\Sales\Model\OrderFactory $orderFactory
-//        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        \Magento\Sales\Model\OrderFactory $orderFactory,
+        \MercadoPago\Core\Helper\Message\MessageInterface $statusMessage,
+        \MercadoPago\Core\Helper\Message\MessageInterface $statusDetailMessage,
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
+        \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
+        \Magento\Payment\Model\Method\Logger $logger,
+        \Magento\Payment\Helper\Data $paymentData,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     )
     {
+        parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $paymentData, $scopeConfig, $logger, null, null, []);
         $this->_storeManager = $storeManager;
         $this->_coreHelper = $coreHelper;
-//        $this->scopeConfig = $scopeConfig;
         $this->_orderFactory = $orderFactory;
+        $this->_statusMessage = $statusMessage;
+        $this->_statusDetailMessage = $statusDetailMessage;
     }
 
     /**
@@ -167,16 +178,16 @@ class Core
             "message" => ""
         );
 
-        $rawMessage = $this->_coreHelper->getMessage($status);
+        $rawMessage = $this->_statusMessage->getMessage($status);
         $message['title'] = __($rawMessage['title']);
 
         if ($status == 'rejected') {
             if ($status_detail == 'cc_rejected_invalid_installments') {
-                $message['message'] = __($this->_coreHelper->getMessage($status_detail), strtoupper($payment_method), $installment);
+                $message['message'] = __($this->_statusDetailMessage->getMessage($status_detail), strtoupper($payment_method), $installment);
             } elseif ($status_detail == 'cc_rejected_call_for_authorize') {
-                $message['message'] = __($this->_coreHelper->getMessage($status_detail), strtoupper($payment_method), $amount);
+                $message['message'] = __($this->_statusDetailMessage->getMessage($status_detail), strtoupper($payment_method), $amount);
             } else {
-                $message['message'] = __($this->_coreHelper->getMessage($status_detail), strtoupper($payment_method));
+                $message['message'] = __($this->_statusDetailMessage->getMessage($status_detail), strtoupper($payment_method));
             }
         } else {
             $message['message'] = __($rawMessage['message']);
@@ -381,8 +392,8 @@ class Core
 
     public function getMerchantOrder($merchant_order_id)
     {
-        $clientId = $this->scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_CLIENT_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        $clientSecret = $this->scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_CLIENT_SECRET, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $clientId = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_CLIENT_ID);
+        $clientSecret = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_CLIENT_SECRET);
         $mp = $this->_coreHelper->getApiInstance($clientId, $clientSecret);
 
         return $mp->get("/merchant_orders/" . $merchant_order_id);
