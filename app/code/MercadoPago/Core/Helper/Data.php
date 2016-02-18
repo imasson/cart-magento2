@@ -4,6 +4,11 @@ namespace MercadoPago\Core\Helper;
 use Magento\Framework\View\LayoutFactory;
 
 
+/**
+ * Class Data
+ *
+ * @package MercadoPago\Core\Helper
+ */
 class Data
     extends \Magento\Payment\Helper\Data
 {
@@ -28,6 +33,7 @@ class Data
      * @var \MercadoPago\Core\Logger\Logger
      */
     protected $_mpLogger;
+    protected $_statusFactory;
 
     public function __construct(
         \MercadoPago\Core\Helper\Message\MessageInterface $messageInterface,
@@ -37,12 +43,14 @@ class Data
         \Magento\Store\Model\App\Emulation $appEmulation,
         \Magento\Payment\Model\Config $paymentConfig,
         \Magento\Framework\App\Config\Initial $initialConfig,
-        \MercadoPago\Core\Logger\Logger $logger
+        \MercadoPago\Core\Logger\Logger $logger,
+        \Magento\Sales\Model\ResourceModel\Status\Collection $statusFactory
     )
     {
         parent::__construct($context, $layoutFactory, $paymentMethodFactory, $appEmulation, $paymentConfig, $initialConfig);
         $this->messageInterface = $messageInterface;
         $this->_mpLogger = $logger;
+        $this->_statusFactory = $statusFactory;
     }
 
 
@@ -198,12 +206,13 @@ class Data
      * @param string $status
      */
     public function _getAssignedState($status)
-    {   //TODO modify model loading
-        $item = Mage::getResourceModel('sales/order_status_collection')
+    {
+        $collection = $this->_statusFactory
             ->joinStates()
             ->addFieldToFilter('main_table.status', $status);
 
-        return array_pop($item->getItems())->getState();
+        $collectionItems = $collection->getItems();
+        return array_pop($collectionItems)->getState();
     }
 
     /**
@@ -214,7 +223,7 @@ class Data
      * @return \Magento\Framework\Phrase|string
      */
     public function getMessage($status, $payment)
-    {
+    {   //TODO fix translations
         $rawMessage = __($this->messageInterface->getMessage($status));
         $rawMessage .= __('<br/> Payment id: %s', $payment['id']);
         $rawMessage .= __('<br/> Status: %s', $payment['status']);

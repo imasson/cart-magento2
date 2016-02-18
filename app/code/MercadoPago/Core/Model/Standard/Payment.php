@@ -7,7 +7,7 @@ class Payment
     extends \Magento\Payment\Model\Method\AbstractMethod
 {
     const CODE = 'mercadopago_standard';
-    const ACTION_URL = 'http://mercadopago2.local/mercadopago/standard/pay';
+    const ACTION_URL = 'http://cart-magento2.local/mercadopago/standard/pay';
 
     protected $_code = self::CODE;
 
