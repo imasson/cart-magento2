@@ -28,7 +28,7 @@ class Success
         $checkoutTypeHandle = $this->getCheckoutHandle();
         $this->_view->loadLayout(['default', $checkoutTypeHandle]);
 
-//        $this->_initLayoutMessages('core/session');
+//        $this->_initLayoutMessages('core/session'); //TODO session messages
 
         $this->_view->renderLayout();
     }
