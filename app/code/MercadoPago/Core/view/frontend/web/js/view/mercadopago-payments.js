@@ -29,7 +29,12 @@ define(
                 }
             );
         }
-
+        rendererList.push(
+            {
+                type: 'mercadopago_custom',
+                component: 'MercadoPago_Core/js/view/method-renderer/custom-method'
+            }
+        );
         return Component.extend({});
     }
 );
