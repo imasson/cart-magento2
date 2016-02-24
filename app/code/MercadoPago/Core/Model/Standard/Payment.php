@@ -2,12 +2,23 @@
 
 namespace MercadoPago\Core\Model\Standard;
 
-
+/**
+ * Class Payment
+ *
+ * @package MercadoPago\Core\Model\Standard
+ */
 class Payment
     extends \Magento\Payment\Model\Method\AbstractMethod
 {
+    /**
+     * Define payment method code
+     */
     const CODE = 'mercadopago_standard';
-    const ACTION_URL = 'http://cart-magento2.local/mercadopago/standard/pay';
+
+    /**
+     * define URL to go when an order is placed
+     */
+    const ACTION_URL = 'mercadopago/standard/pay';
 
     protected $_code = self::CODE;
 
@@ -22,11 +33,34 @@ class Payment
     protected $_canFetchTransactionInfo = true;
     protected $_canReviewPayment = true;
 
+    /**
+     * @var \MercadoPago\Core\Helper\Data
+     */
     protected $_helperData;
+
+    /**
+     * @var \Magento\Catalog\Helper\Image
+     */
     protected $_helperImage;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
     protected $_checkoutSession;
+
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
     protected $_customerSession;
+
+    /**
+     * @var \Magento\Sales\Model\OrderFactory
+     */
     protected $_orderFactory;
+
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
     protected $_urlBuilder;
 
     public function __construct(
@@ -70,23 +104,24 @@ class Payment
         $this->_urlBuilder = $urlBuilder;
     }
 
+    /**
+     * Return array with data of payment in MP site
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function postPago()
     {
-        //seta sdk php mercadopago
         $client_id = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_CLIENT_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $client_secret = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_CLIENT_SECRET, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 
         $mp = $this->_helperData->getApiInstance($client_id, $client_secret);
 
-        //monta a prefernecia
         $pref = $this->makePreference();
         $this->_helperData->log("make array", 'mercadopago-standard.log', $pref);
 
-        //faz o posto do pagamento
         $response = $mp->create_preference($pref);
         $this->_helperData->log("create preference result", 'mercadopago-standard.log', $response);
-
-        $array_assign = [];
 
         if ($response['status'] == 200 || $response['status'] == 201) {
             $payment = $response['response'];
@@ -119,12 +154,23 @@ class Payment
         return $array_assign;
     }
 
+    /**
+     * Return array with data to send to MP api
+     *
+     * @return array
+     */
     public function makePreference()
     {
         $orderIncrementId = $this->_checkoutSession->getLastRealOrderId();
         $order = $this->_orderFactory->create()->loadByIncrementId($orderIncrementId);
         $customer = $this->_customerSession->getCustomer();
         $payment = $order->getPayment();
+        $paramsShipment = [];
+
+        $this->_eventManager->dispatch(
+            'mercadopago_standard_make_preference_before',
+            ['params' => $paramsShipment, 'order' => $order]
+        );
         $arr = [];
 
         $arr['external_reference'] = $orderIncrementId;
@@ -161,7 +207,8 @@ class Payment
             "number"    => $shipping['telephone']
         ];
 
-        $arr['shipments'] = $this->_getShipmentsParams($order);
+        $paramsShipment['receiver_address'] = $this->getReceiverAddress($order->getShippingAddress());
+        $arr['shipments'] = $paramsShipment;
 
         $billing_address = $order->getBillingAddress()->getData();
 
@@ -184,9 +231,9 @@ class Payment
         ];
 
         $arr['back_urls'] = [
-            'success'=> $this->_urlBuilder->getUrl('mercadopago/standard/success'),
-            'pending'=> $this->_urlBuilder->getUrl('mercadopago/standard/success'),
-            'failure'=> $this->_urlBuilder->getUrl('mercadopago/standard/success')
+            'success' => $this->_urlBuilder->getUrl('mercadopago/standard/success'),
+            'pending' => $this->_urlBuilder->getUrl('mercadopago/standard/success'),
+            'failure' => $this->_urlBuilder->getUrl('checkout/onepage/failure'),
         ];
 
         $arr['notification_url'] = $this->_urlBuilder->getUrl("mercadopago/notifications/standard");
@@ -211,6 +258,13 @@ class Payment
         return $arr;
     }
 
+    /**
+     * Return array with data of items of order
+     *
+     * @param $order
+     *
+     * @return array
+     */
     protected function getItems($order)
     {
         $items = [];
@@ -232,6 +286,12 @@ class Payment
         return $items;
     }
 
+    /**
+     * Calculate discount of magento site and set data in arr param
+     *
+     * @param $arr
+     * @param $order
+     */
     protected function _calculateDiscountAmount(&$arr, $order)
     {
         if ($order->getDiscountAmount() < 0) {
@@ -245,6 +305,10 @@ class Payment
         }
     }
 
+    /**
+     * @param $arr
+     * @param $order
+     */
     protected function _calculateBaseTaxAmount(&$arr, $order)
     {
         if ($order->getBaseTaxAmount() > 0) {
@@ -258,6 +322,13 @@ class Payment
         }
     }
 
+    /**
+     * Return total price of all items
+     *
+     * @param $items
+     *
+     * @return int
+     */
     protected function getTotalItems($items)
     {
         $total = 0;
@@ -268,6 +339,9 @@ class Payment
         return $total;
     }
 
+    /**
+     * @return array
+     */
     protected function getExcludedPaymentsMethods()
     {
         $excludedMethods = [];
@@ -282,44 +356,38 @@ class Payment
         return $excludedMethods;
     }
 
-    protected function _getShipmentsParams($order)
+    /**
+     * Return info of shipping address
+     *
+     * @param $shippingAddress
+     *
+     * @return array
+     */
+    protected function getReceiverAddress($shippingAddress)
     {
-        $params = [];
-        $shippingCost = $order->getBaseShippingAmount();
-        $shippingAddress = $order->getShippingAddress();
-        $method = $order->getShippingMethod();
-        //TODO JOIN WITH MERCADOENVIOS
-//        if ($this->mercadoEnviosHelper->isMercadoEnviosMethod($method)) {
-//            $zipCode = $shippingAddress->getPostcode();
-//            $defaultShippingId = substr($method, strpos($method, '_') + 1);
-//            $params = [
-//                'mode'                    => 'me2',
-//                'zip_code'                => $zipCode,
-//                'default_shipping_method' => intval($defaultShippingId),
-//                'dimensions'              => $this->mercadoEnviosHelper->getDimensions($order->getAllItems())
-//            ];
-//            if ($shippingCost == 0) {
-//                $params['free_methods'] = [['id' => intval($defaultShippingId)]];
-//            }
-//        }
-        if (!empty($shippingCost)) {
-            $params['cost'] = (float)$order->getBaseShippingAmount();
-        }
-
-        $params['receiver_address'] = [
+        return [
             "floor"         => "-",
             "zip_code"      => $shippingAddress->getPostcode(),
             "street_name"   => $shippingAddress->getStreet()[0] . " - " . $shippingAddress->getCity() . " - " . $shippingAddress->getCountryId(),
             "apartment"     => "-",
             "street_number" => ""
         ];
-
-        return $params;
-
     }
 
-    public function getBannerCheckoutUrl() {
+    /**
+     * @return mixed
+     */
+    public function getBannerCheckoutUrl()
+    {
         return $this->getConfigData('banner_checkout');
+    }
+
+    /**
+     * @return string
+     */
+    public function getActionUrl()
+    {
+        return $this->_urlBuilder->getUrl(self::ACTION_URL);
     }
 
 }

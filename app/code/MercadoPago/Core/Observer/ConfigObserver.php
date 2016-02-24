@@ -11,6 +11,9 @@ use Magento\Framework\Event\ObserverInterface;
 class ConfigObserver
     implements ObserverInterface
 {
+    /**
+     * @var array
+     */
     private $banners = [
         "mercadopago_custom"       => [
             "mla" => "http://imgmp.mlstatic.com/org-img/banners/ar/medios/online/468X60.jpg",
@@ -34,8 +37,15 @@ class ConfigObserver
         ]
     ];
 
+    /**
+     * @var array
+     */
     private $available_transparent_credit_cart = ['mla', 'mlb', 'mlm'];
+    /**
+     * @var array
+     */
     private $available_transparent_ticket = ['mla', 'mlb', 'mlm'];
+
     const LOG_NAME = 'mercadopago';
 
     /**

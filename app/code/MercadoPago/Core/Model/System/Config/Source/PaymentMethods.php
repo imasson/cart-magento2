@@ -12,8 +12,15 @@ class PaymentMethods
     const XML_PATH_ACCESS_TOKEN = 'payment/mercadopago_custom/access_token';
     const XML_PATH_CLIENT_ID = 'payment/mercadopago_standard/client_id';
     const XML_PATH_CLIENT_SECRET = 'payment/mercadopago_standard/client_secret';
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
     private $scopeConfig;
 
+    /**
+     * @var \MercadoPago\Core\Helper\Data
+     */
     protected $coreHelper;
 
 

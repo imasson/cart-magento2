@@ -1,7 +1,13 @@
 <?php
 namespace MercadoPago\Core\Model;
 
-
+/**
+ * Core Model of MP plugin, used by all payment methods
+ *
+ * Class Core
+ *
+ * @package MercadoPago\Core\Model
+ */
 class Core
     extends \Magento\Payment\Model\Method\AbstractMethod
 {
@@ -19,7 +25,10 @@ class Core
     protected $_canUseCheckout = true;
     protected $_canFetchTransactionInfo = true;
     protected $_canReviewPayment = true;
-
+	
+	/**
+     * Define path of access token config
+     */
     const XML_PATH_ACCESS_TOKEN = 'payment/mercadopago_custom_checkout/access_token';
 
     /**
@@ -32,18 +41,48 @@ class Core
      */
     protected $_coreHelper;
 
-    protected $_orderFactory;
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $_scopeConfig;
 
+    /**
+     * @var \Magento\Sales\Model\OrderFactory
+     */
+     protected $_orderFactory;
+
+    /**
+     * @var
+     */
     protected $_accessToken;
+    /**
+     * @var
+     */
     protected $_clientId;
+    /**
+     * @var
+     */
     protected $_clientSecret;
+
     /**
      * @var \MercadoPago\Core\Helper\Message\MessageInterface
      */
     protected $_statusMessage;
+    /**
+     * @var \MercadoPago\Core\Helper\Message\MessageInterface
+     */
     protected $_statusDetailMessage;
+    /**
+     * @var \Magento\Framework\DB\TransactionFactory
+     */
     protected $_transactionFactory;
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\InvoiceSender
+     */
     protected $_invoiceSender;
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+     */
     protected $_orderSender;
 
 
@@ -126,6 +165,13 @@ class Core
         return $this->_orderFactory->create()->loadByIncrementId($incrementId);
     }
 
+    /**
+     * Return array with data of payment of order loaded with order_id param
+     *
+     * @param $order_id
+     *
+     * @return array
+     */
     public function getInfoPaymentByOrder($order_id)
     {
         $order = $this->_getOrder($order_id);
@@ -157,6 +203,11 @@ class Core
         return $info_payments;
     }
 
+    /**
+     * @param $status
+     *
+     * @return string
+     */
     protected function validStatusTwoPayments($status)
     {
         $array_status = explode(" | ", $status);
@@ -208,6 +259,14 @@ class Core
         return $message;
     }
 
+    /**
+     * Return array with info of customer
+     *
+     * @param $customer
+     * @param $order
+     *
+     * @return array
+     */
     protected function getCustomerInfo($customer, $order)
     {
         $email = htmlentities($customer->getEmail());
@@ -228,6 +287,13 @@ class Core
         return array('email' => $email, 'first_name' => $first_name, 'last_name' => $last_name);
     }
 
+    /**
+     * Return info about items of order
+     *
+     * @param $order
+     *
+     * @return array
+     */
     protected function getItemsInfo($order)
     {
         $dataItems = array();
@@ -261,6 +327,14 @@ class Core
 
     }
 
+    /**
+     * Return info of a coupon applied
+     *
+     * @param $coupon
+     * @param $coupon_code
+     *
+     * @return array
+     */
     protected function getCouponInfo($coupon, $coupon_code)
     {
         $infoCoupon = array();
@@ -276,6 +350,13 @@ class Core
         return $infoCoupon;
     }
 
+    /**
+     * Return array with preference data by default to custom method
+     *
+     * @param array $payment_info
+     *
+     * @return array
+     */
     public function makeDefaultPreferencePaymentV1($payment_info = array())
     {
         $quote = $this->_getQuote();
@@ -351,7 +432,15 @@ class Core
         return $preference;
     }
 
-
+    /**
+     * Return response of api to a preference
+     *
+     * @param $preference
+     *
+     * @return array
+     * @throws \Api\V1\Exception
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function postPaymentV1($preference)
     {
 
@@ -387,6 +476,14 @@ class Core
         }
     }
 
+    /**
+     * Return info of payment returned by MP api
+     *
+     * @param $payment_id
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function getPayment($payment_id)
     {
         if (!$this->_clientId || !$this->_clientSecret) {
@@ -419,6 +516,10 @@ class Core
         return $mp->get("/merchant_orders/" . $merchant_order_id);
     }
 
+    /**
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function getPaymentMethods()
     {
         if (!$this->_accessToken) {
@@ -432,6 +533,9 @@ class Core
         return $payment_methods;
     }
 
+    /**
+     * @return mixed|string
+     */
     public function getEmailCustomer()
     {   //TODO customer model
         $customer = Mage::getSingleton('customer/session')->getCustomer();
@@ -445,7 +549,9 @@ class Core
         return $email;
     }
 
-
+    /**
+     * @return float
+     */
     public function getAmount()
     {
         $quote = $this->_getQuote();
@@ -455,6 +561,14 @@ class Core
 
     }
 
+    /**
+     * Check if an applied coupon is valid
+     *
+     * @param $id
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function validCoupon($id)
     {
         if (!$this->_accessToken) {
@@ -479,6 +593,12 @@ class Core
         return $details_discount;
     }
 
+    /**
+     * @param      $payment
+     * @param null $stateObject
+     *
+     * @return array
+     */
     public function setStatusOrder($payment, $stateObject = null)
     {
         $helper = $this->_coreHelper;
@@ -494,6 +614,7 @@ class Core
         try {
             if ($status == 'approved') {
                 $this->_coreHelper->setOrderSubtotals($payment, $order);
+
                 if (!$order->hasInvoices()) {
                     $invoice = $order->prepareInvoice();
                     $invoice->register()->pay();
@@ -540,6 +661,11 @@ class Core
         }
     }
 
+    /**
+     * Set info in order
+     *
+     * @param $data
+     */
     public function updateOrder($data)
     {
         $this->_coreHelper->log("Update Order", 'mercadopago-notification.log');

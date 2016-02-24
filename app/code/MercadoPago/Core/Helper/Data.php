@@ -35,6 +35,19 @@ class Data
     protected $_mpLogger;
     protected $_statusFactory;
 
+    /**
+     * Data constructor.
+     *
+     * @param Message\MessageInterface              $messageInterface
+     * @param \Magento\Framework\App\Helper\Context $context
+     * @param LayoutFactory                         $layoutFactory
+     * @param \Magento\Payment\Model\Method\Factory $paymentMethodFactory
+     * @param \Magento\Store\Model\App\Emulation    $appEmulation
+     * @param \Magento\Payment\Model\Config         $paymentConfig
+     * @param \Magento\Framework\App\Config\Initial $initialConfig
+     * @param \MercadoPago\Core\Logger\Logger       $logger
+	 * @param \Magento\Sales\Model\ResourceModel\Status\Collection $statusFactory
+     */
     public function __construct(
         \MercadoPago\Core\Helper\Message\MessageInterface $messageInterface,
         \Magento\Framework\App\Helper\Context $context,
@@ -43,13 +56,15 @@ class Data
         \Magento\Store\Model\App\Emulation $appEmulation,
         \Magento\Payment\Model\Config $paymentConfig,
         \Magento\Framework\App\Config\Initial $initialConfig,
-        \MercadoPago\Core\Logger\Logger $logger,
+        \Magento\Framework\Setup\ModuleContextInterface $moduleContext,
+		\MercadoPago\Core\Logger\Logger $logger,
         \Magento\Sales\Model\ResourceModel\Status\Collection $statusFactory
     )
     {
         parent::__construct($context, $layoutFactory, $paymentMethodFactory, $appEmulation, $paymentConfig, $initialConfig);
         $this->messageInterface = $messageInterface;
         $this->_mpLogger = $logger;
+		$this->_moduleContext = $moduleContext;
         $this->_statusFactory = $statusFactory;
     }
 
@@ -100,8 +115,7 @@ class Data
         }
 
         $api->set_type(self::TYPE);
-
-        //$api->set_so((string) Mage::getConfig()->getModuleConfig("MercadoPago_Core")->version); //TODO get module version
+        $api->set_so((string)$this->_moduleContext->getVersion());
 
         return $api;
 
@@ -146,7 +160,8 @@ class Data
     }
 
     /**
-     * Return access token
+     * Return the access token proved by api
+     *
      * @return mixed
      * @throws \Exception
      * @throws \Magento\Framework\Exception\LocalizedException
