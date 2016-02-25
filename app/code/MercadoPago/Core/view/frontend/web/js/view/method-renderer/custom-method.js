@@ -1,10 +1,11 @@
 define(
     [
-        'jquery',
         'Magento_Payment/js/view/payment/iframe',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Checkout/js/action/set-payment-information',
-        'Magento_Checkout/js/model/full-screen-loader'
+        'Magento_Checkout/js/model/full-screen-loader',
+        'meli',
+        'tinyj'
     ],
     function ($, Component, additionalValidators, setPaymentInformationAction, fullScreenLoader) {
         'use strict';
@@ -45,7 +46,6 @@ define(
              */
             placeOrder: function () {
                 var self = this;
-
                 //if (this.validateHandler() && additionalValidators.validate()) {
                 //    fullScreenLoader.startLoader();
                 //    this.isPlaceOrderActionAllowed(false);
@@ -61,6 +61,7 @@ define(
                 //    });
                 //}
             }
+
         });
     }
 );

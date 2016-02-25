@@ -18,14 +18,10 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-        <iframe width="0"
-                height="0"
-                data-bind="src: getSource(), attr: {id: getCode() + '-transparent-iframe', 'data-container': getCode() + '-transparent-iframe'}"
-                allowtransparency="true"
-                frameborder="0"
-                name="iframeTransparent"
-                class="payment-method-iframe">
-        </iframe>
+        <div id="custom_banner_checkout">
+            <img class="banner_checkout_mp" data-bind="attr: {src: getBannerUrl()}"/>
+        </div>
+
         <form class="form" id="co-transparent-form" action="#" method="post" data-bind="mageInit: {
             'transparent':{
                 'context': context(),
@@ -44,6 +40,21 @@
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
                 <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
+        </div>
+        <div>
+            <input type="hidden" class="total_amount" name="total_amount" data-bind="attr: {value: getGrandTotal()}"/>
+            <!--<input type="hidden" class="amount" name="amount" value="<?php echo $grant_total; ?>"/>-->
+            <!--<input type="hidden" class="mercadopago-discount-amount" name="mercadopago-discount-amount" value="0"/>-->
+            <!--<input type="hidden" class="site_id" name="site_id" value="<?php echo strtoupper($country); ?>"/>-->
+            <!--<input type="hidden" class="mercadopago-text-currency" value="<?php echo $this->__('$'); ?>">-->
+            <!--<input type="hidden" class="mercadopago-text-choice" value="<?php echo $this->__('Choice'); ?>">-->
+            <!--<input type="hidden" class="mercadopago-text-default-issuer" value="<?php echo $this->__('Default issuer'); ?>">-->
+            <!--<input type="hidden" class="mercadopago-text-installment" value="<?php echo $this->__('Enter the card number'); ?>">-->
+            <!--<input type="hidden" class="mercado_base_url" value="<?php echo $base_url; ?>">-->
+            <!--<input type="hidden" class="mercado_route" value="<?php echo $route; ?>">-->
+            <!--<input type="hidden" name="payment[<?php echo $_code; ?>][token]" type="text" value="" class="token"/>-->
+            <!--<input type="hidden" name="payment[<?php echo $_code; ?>][payment_method_id]" type="text" value="" class="payment_method_id"/>-->
+
         </div>
         <div class="actions-toolbar">
             <div class="primary">
