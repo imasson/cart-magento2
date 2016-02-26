@@ -68,6 +68,7 @@ class CustomConfigProvider
                     'base_url' =>    $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_LINK),
                     'logEnabled' => $this->_scopeConfig->getValue('payment/mercadopago/logs'),
                     'route' => $this->_request->getRouteName(),
+                    'public_key' => $this->methodInstance->getConfigData('public_key'),
                     'text-currency' => __('$'),
                     'text-choice' => __('Choice'),
                     'default-issuer' => __('Default issuer'),

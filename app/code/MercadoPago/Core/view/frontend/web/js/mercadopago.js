@@ -82,7 +82,7 @@ var MercadoPagoCustom = (function () {
             siteId: '#mercadopago_checkout_custom .site_id',
             cardNumberInput: 'input[data-checkout="cardNumber"]',
             installmentsDontWork: '.error-installment-not-work',
-            mercadopagoCustomOpt: '#p_method_mercadopago_custom',
+            mercadopagoCustomOpt: '#mercadopago_custom',
             cardExpYear: '#cardExpirationYear',
             docType: '#docType',
             cardId: '#cardId',
@@ -238,28 +238,28 @@ var MercadoPagoCustom = (function () {
             cardsHandler();
 
             if (TinyJ(self.selectors.mercadopagoCustomOpt).isChecked()) {
-                payment.switchMethod(self.constants.mercadopagoCustom);
+                //payment.switchMethod(self.constants.mercadopagoCustom);
             }
 
-            Validation.add(self.constants.validateDiscount, ' ', function (v, element) {
-                return (!element.hasClassName(self.constants.invalidCoupon));
-            });
-
-            Validation.add(self.constants.validateDocNumber, self.messages.invalidDocument, function (v, element) {
-                return checkDocNumber(v);
-            });
-
-            Validation.add(self.constants.validateCC, self.messages.incorrectExpDate, function (v, element) {
-                var ccExpMonth = v;
-                var ccExpYear = TinyJ(self.selectors.cardExpYear).val();
-                var currentTime = new Date();
-                var currentMonth = currentTime.getMonth() + 1;
-                var currentYear = currentTime.getFullYear();
-                if (ccExpMonth < currentMonth && ccExpYear == currentYear) {
-                    return false;
-                }
-                return true;
-            });
+            //Validation.add(self.constants.validateDiscount, ' ', function (v, element) {
+            //    return (!element.hasClassName(self.constants.invalidCoupon));
+            //});
+            //
+            //Validation.add(self.constants.validateDocNumber, self.messages.invalidDocument, function (v, element) {
+            //    return checkDocNumber(v);
+            //});
+            //
+            //Validation.add(self.constants.validateCC, self.messages.incorrectExpDate, function (v, element) {
+            //    var ccExpMonth = v;
+            //    var ccExpYear = TinyJ(self.selectors.cardExpYear).val();
+            //    var currentTime = new Date();
+            //    var currentMonth = currentTime.getMonth() + 1;
+            //    var currentYear = currentTime.getFullYear();
+            //    if (ccExpMonth < currentMonth && ccExpYear == currentYear) {
+            //        return false;
+            //    }
+            //    return true;
+            //});
         }
 
         function setPaymentMethodId(event) {
