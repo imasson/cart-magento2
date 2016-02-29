@@ -59,7 +59,8 @@ class Data
         \Magento\Payment\Model\Config $paymentConfig,
         \Magento\Framework\App\Config\Initial $initialConfig,
         \Magento\Framework\Setup\ModuleContextInterface $moduleContext,
-		\MercadoPago\Core\Logger\Logger $logger
+		\MercadoPago\Core\Logger\Logger $logger,
+        \Magento\Sales\Model\ResourceModel\Status\Collection $statusFactory
     )
     {
         parent::__construct($context, $layoutFactory, $paymentMethodFactory, $appEmulation, $paymentConfig, $initialConfig);
