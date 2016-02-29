@@ -1,5 +1,5 @@
 <?php
-namespace MercadoPago\Core\Helper;
+namespace MercadoPago\Core\Helper\Message;
 
 
 /**
