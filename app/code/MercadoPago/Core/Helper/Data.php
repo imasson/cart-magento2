@@ -25,9 +25,11 @@ class Data
     /**
      * @var \MercadoPago\Core\Helper\Message\MessageInterface
      */
-    protected $messageInterface;
+    protected $_messageInterface;
 
-    /**
+    protected $_moduleContext;
+
+	/**
      * MercadoPago Logging instance
      *
      * @var \MercadoPago\Core\Logger\Logger
@@ -57,12 +59,11 @@ class Data
         \Magento\Payment\Model\Config $paymentConfig,
         \Magento\Framework\App\Config\Initial $initialConfig,
         \Magento\Framework\Setup\ModuleContextInterface $moduleContext,
-		\MercadoPago\Core\Logger\Logger $logger,
-        \Magento\Sales\Model\ResourceModel\Status\Collection $statusFactory
+		\MercadoPago\Core\Logger\Logger $logger
     )
     {
         parent::__construct($context, $layoutFactory, $paymentMethodFactory, $appEmulation, $paymentConfig, $initialConfig);
-        $this->messageInterface = $messageInterface;
+        $this->_messageInterface = $messageInterface;
         $this->_mpLogger = $logger;
 		$this->_moduleContext = $moduleContext;
         $this->_statusFactory = $statusFactory;
@@ -239,7 +240,7 @@ class Data
      */
     public function getMessage($status, $payment)
     {   //TODO fix translations
-        $rawMessage = __($this->messageInterface->getMessage($status));
+        $rawMessage = __($this->_messageInterface->getMessage($status));
         $rawMessage .= __('<br/> Payment id: %s', $payment['id']);
         $rawMessage .= __('<br/> Status: %s', $payment['status']);
         $rawMessage .= __('<br/> Status Detail: %s', $payment['status_detail']);
