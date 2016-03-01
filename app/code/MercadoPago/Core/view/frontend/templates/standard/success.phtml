@@ -17,10 +17,10 @@ $info_payment = $this->getInfoPayment();
         </h2><p><?php echo $link_to_order; ?></p>
     <?php else: ?><?php
         $message_status = $this->getMessageByStatus(
-            $info_payment['status']['value'],
-            $info_payment['status_detail']['value'],
-            $info_payment['payment_method']['value'],
-            $info_payment['installment']['value'],
+            isset($info_payment['status']['value']) ? $info_payment['status']['value'] : '',
+            isset($info_payment['status_detail']['value']) ? $info_payment['status_detail']['value'] : '',
+            isset($info_payment['payment_method']['value']) ? $info_payment['payment_method']['value'] : '',
+            isset($info_payment['installments']['value']) ? $info_payment['installments']['value'] : '',
             $this->getTotal()
         );
         ?>
