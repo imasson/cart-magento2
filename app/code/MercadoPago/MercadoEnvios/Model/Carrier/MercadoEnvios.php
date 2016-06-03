@@ -17,7 +17,8 @@ class MercadoEnvios
      *
      * @var string
      */
-    protected $_code = 'mercadoenvios';
+    protected $_code = self::CODE;
+    const CODE = 'mercadoenvios';
 
     protected $_helperData;
 
@@ -28,7 +29,8 @@ class MercadoEnvios
     protected $_available;
     protected $_methods;
     protected $_request;
-
+    protected $_rateResultFactory;
+    protected $_rateMethodFactory;
 
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -70,7 +72,7 @@ class MercadoEnvios
 
             try {
                 $dimensions = $this->_helperData->getDimensions($this->_helperData->getAllItems($this->_request->getAllItems()));
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->_methods = self::INVALID_METHOD;
 
                 return;
@@ -127,8 +129,6 @@ class MercadoEnvios
         return $allowedMethods;
     }
 
-
-
     /**
      * @param RateRequest $request
      * @return bool|Result
@@ -150,9 +150,6 @@ class MercadoEnvios
 
         return $result;
     }
-
-
-
 
     public function getDataMethod($methodId)
     {
@@ -213,7 +210,7 @@ class MercadoEnvios
         $current->setTime(0);
         $nextNotificationDate = $current->add($dataTime['shipping'], \Zend_Date::HOUR);
 
-        return $this->_timezone->formatDate($nextNotificationDate);
+        return $this->_timezone->formatDate('@' . $nextNotificationDate->getTimestamp());
     }
 
     protected function _isAvailableRate($rateId)

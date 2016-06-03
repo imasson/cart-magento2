@@ -35,6 +35,7 @@ class Data
     protected $_mpLogger;
 
     protected $_helperItem;
+    protected $_helperCarrier;
 
     public static $enabled_methods = ['mla', 'mlb', 'mlm'];
 
@@ -44,6 +45,7 @@ class Data
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Catalog\Model\ProductFactory $productFactory,
         \MercadoPago\MercadoEnvios\Helper\ItemData $helperItem,
+        \MercadoPago\MercadoEnvios\Helper\CarrierData $helperCarrier,
         \MercadoPago\Core\Logger\Logger $mpLogger
     )
     {
@@ -51,6 +53,7 @@ class Data
         $this->_checkoutSession = $checkoutSession;
         $this->_productFactory = $productFactory;
         $this->_helperItem = $helperItem;
+        $this->_helperCarrier = $helperCarrier;
         $this->_mpLogger = $mpLogger;
 
     }
@@ -65,74 +68,37 @@ class Data
         $height = 0;
         $length = 0;
         $weight = 0;
+        $bulk = 0;
         foreach ($items as $item) {
-            $width += $this->_getShippingDimension($item, 'width');
-            $height += $this->_getShippingDimension($item, 'height');
-            $length += $this->_getShippingDimension($item, 'length');
-            $weight += $this->_getShippingDimension($item, 'weight');
+            $tempWidth = $this->_helperCarrier->_getShippingDimension($item, 'width');
+            $tempHeight = $this->_helperCarrier->_getShippingDimension($item, 'height');
+            $tempLength = $this->_helperCarrier->_getShippingDimension($item, 'length');
+            $tempWeight = $this->_helperCarrier->_getShippingDimension($item, 'weight');
+            $qty = $this->_helperItem->itemGetQty($item);
+            $bulk += ($tempWidth * $tempHeight * $tempLength) * $qty;
+            $width += $tempWidth * $qty;
+            $height += $tempHeight * $qty;
+            $length += $tempLength * $qty;
+            $weight += $tempWeight * $qty;
         }
         $height = ceil($height);
         $width = ceil($width);
         $length = ceil($length);
         $weight = ceil($weight);
 
-        if (!($height > 0 && $length > 0 && $width > 0 && $weight > 0)) {
-            $this->log('Invalid dimensions in cart:', ['width' => $width, 'height' => $height, 'length' => $length, 'weight' => $weight,]);
-            throw new \Magento\Framework\Exception\LocalizedException('Invalid dimensions cart');
-        }
+        $this->_helperCarrier->validateCartDimension($height, $width, $length, $weight);
+        $bulk = ceil(pow($bulk, 1/3));
 
-        return $height . 'x' . $width . 'x' . $length . ',' . $weight;
+        return $bulk . 'x' . $bulk . 'x' . $bulk . ',' . $weight;
 
     }
 
     /**
-     * @param $item Mage_Sales_Model_Quote_Item
-     */
-    protected function _getShippingDimension($item, $type)
-    {
-        $attributeMapped = $this->_getConfigAttributeMapped($type);
-        if (!empty($attributeMapped)) {
-            if (!isset($this->_products[$item->getProductId()])) {
-                $this->_products[$item->getProductId()] = $this->_productFactory->create()->load($item->getProductId());
-            }
-            $product = $this->_products[$item->getProductId()];
-            $result = $product->getData($attributeMapped);
-            $result = $this->getAttributesMappingUnitConversion($type, $result);
-            $qty = $this->_helperItem->itemGetQty($item);
-            $result = $result * $qty;
-            if (empty($result)) {
-                $this->log('Invalid dimension product: PRODUCT ', $item->getData());
-                throw new \Magento\Framework\Exception\LocalizedException('Invalid dimensions product');
-            }
-
-            return $result;
-        }
-
-        return 0;
-    }
-
-    protected function _getConfigAttributeMapped($type)
-    {
-        return (isset($this->getAttributeMapping()[$type]['code'])) ? $this->getAttributeMapping()[$type]['code'] : null;
-    }
-
-    public function getAttributeMapping()
-    {
-        if (empty($this->_mapping)) {
-            $mapping =  $this->scopeConfig->getValue(self::XML_PATH_ATTRIBUTES_MAPPING, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-            $mapping = unserialize($mapping);
-            $mappingResult = [];
-            foreach ($mapping as $key => $map) {
-                $mappingResult[$key] = ['code' => $map['attribute_code'], 'unit' => $map['unit']];
-            }
-            $this->_mapping = $mappingResult;
-        }
-
-        return $this->_mapping;
-    }
-
-    /**
-     * @return Mage_Sales_Model_Quote
+     * Retrieves Quote
+     *
+     * @param integer $quoteId
+     *
+     * @return \Magento\Quote\Model\Quote
      */
     public function getQuote()
     {
@@ -141,13 +107,7 @@ class Data
 //        } else {
 //            $quote = Mage::getModel('checkout/cart')->getQuote();
 //        }
-        /**
-         * Retrieves Quote
-         *
-         * @param integer $quoteId
-         *
-         * @return \Magento\Quote\Model\Quote
-         */
+
         return $this->_checkoutSession->getQuote();
 
     }
@@ -156,37 +116,10 @@ class Data
     {
         $shippingMethod = substr($method, 0, strpos($method, '_'));
 
-        return ($shippingMethod == MercadoPago_MercadoEnvios_Model_Shipping_Carrier_MercadoEnvios::CODE);
+        return ($shippingMethod == \MercadoPago\MercadoEnvios\Model\Carrier\MercadoEnvios::CODE);
     }
 
-    /**
-     * @param $attributeType string
-     * @param $value         string
-     *
-     * @return string
-     */
-    public function getAttributesMappingUnitConversion($attributeType, $value)
-    {
-        $this->_getConfigAttributeMapped($attributeType);
 
-        if ($attributeType == 'weight') {
-            //check if needs conversion
-            if ($this->_mapping[$attributeType]['unit'] != self::ME_WEIGHT_UNIT) {
-                $unit = new \Zend_Measure_Weight((float)$value);
-                $unit->convertTo(\Zend_Measure_Weight::GRAM);
-
-                return $unit->getValue();
-            }
-
-        } elseif ($this->_mapping[$attributeType]['unit'] != self::ME_LENGTH_UNIT) {
-            $unit = new \Zend_Measure_Length((float)$value);
-            $unit->convertTo(\Zend_Measure_Length::CENTIMETER);
-
-            return $unit->getValue();
-        }
-
-        return $value;
-    }
 
     public function getFreeMethod($request)
     {
@@ -206,7 +139,7 @@ class Data
 
     public function isCountryEnabled()
     {
-        return (in_array($this->scopeConfig('payment/mercadopago/country',\Magento\Store\Model\ScopeInterface::SCOPE_STORE), self::$enabled_methods));
+        return (in_array($this->scopeConfig->getValue('payment/mercadopago/country',\Magento\Store\Model\ScopeInterface::SCOPE_STORE), self::$enabled_methods));
     }
 
     public function getTrackingUrlByShippingInfo($_shippingInfo)
@@ -259,15 +192,15 @@ class Data
 
     public function getShipmentInfo($shipmentId)
     {
-        $client = new Varien_Http_Client(self::ME_SHIPMENT_URL . $shipmentId);
-        $client->setMethod(Varien_Http_Client::GET);
+        $client = new \Zend_Http_Client(self::ME_SHIPMENT_URL . $shipmentId);
+        $client->setMethod(\Zend_Http_Client::GET);
         $client->setParameterGet('access_token', Mage::helper('mercadopago')->getAccessToken());
 
         try {
             $response = $client->request();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->log($e);
-            throw new Exception($e);
+            throw new \Exception($e);
         }
 
         return json_decode($response->getBody());
@@ -275,13 +208,13 @@ class Data
 
     public function getServiceInfo($serviceId, $country)
     {
-        $client = new Varien_Http_Client(self::ME_SHIPMENT_TRACKING_URL . $country . '/shipping_services');
-        $client->setMethod(Varien_Http_Client::GET);
+        $client = new \Zend_Http_Client(self::ME_SHIPMENT_TRACKING_URL . $country . '/shipping_services');
+        $client->setMethod(\Zend_Http_Client::GET);
         try {
             $response = $client->request();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->log($e);
-            throw new Exception($e);
+            throw new \Exception($e);
         }
 
         $response = json_decode($response->getBody());

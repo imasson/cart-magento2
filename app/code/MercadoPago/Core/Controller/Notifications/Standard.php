@@ -68,12 +68,12 @@ class Standard
             $response = $this->coreModel->getMerchantOrder($id);
             $this->coreHelper->log("Return merchant_order", self::LOG_NAME, $response);
             if ($response['status'] == 200 || $response['status'] == 201) {
-                $merchant_order = $response['response'];
+                $merchantOrder = $response['response'];
 
-                if (count($merchant_order['payments']) > 0) {
-                    $data = $this->_getDataPayments($merchant_order);
-                    $status_final = $this->_getStatusFinal($data['status']);
-                    $shipmentData = (isset($merchant_order['shipments'][0])) ? $merchant_order['shipments'][0] : [];
+                if (count($merchantOrder['payments']) > 0) {
+                    $data = $this->_getDataPayments($merchantOrder);
+                    $statusFinal = $this->_getStatusFinal($data['status']);
+                    $shipmentData = (isset($merchantOrder['shipments'][0])) ? $merchantOrder['shipments'][0] : [];
                     $this->coreHelper->log("Update Order", self::LOG_NAME);
                     $this->coreHelper->setStatusUpdated($data);
                     $this->coreModel->updateOrder($data);
@@ -81,26 +81,36 @@ class Standard
                     if (!empty($shipmentData)) {
                         $this->_eventManager->dispatch(
                             'mercadopago_standard_notification_before_set_status',
-                            ['shipmentData' => $shipmentData, 'orderId' => $merchant_order['external_reference']]
+                            ['shipmentData' => $shipmentData, 'orderId' => $merchantOrder['external_reference']]
                         );
                     }
 
-                    if ($status_final != false) {
-                        $data['status_final'] = $status_final;
+                    if ($statusFinal != false) {
+                        $data['status_final'] = $statusFinal;
                         $this->coreHelper->log("Received Payment data", self::LOG_NAME, $data);
                         $setStatusResponse = $this->coreModel->setStatusOrder($data);
                         $this->getResponse()->setBody($setStatusResponse['text']);
                         $this->getResponse()->setHttpResponseCode($setStatusResponse['code']);
+                    } else {
+                        $this->getResponse()->setBody("Status not final");
+                        $this->getResponse()->setHttpResponseCode(\MercadoPago\Core\Helper\Response::HTTP_OK);
                     }
-
+                    if (!empty($shipmentData)) {
+                        $this->_eventManager->dispatch('mercadopago_standard_notification_received',
+                            ['payment'        => $data,
+                             'merchant_order' => $merchantOrder]
+                        );
+                    }
                     return;
                 }
             }
+        } else {
+            $this->coreHelper->log("Merchant Order not found", self::LOG_NAME, $request->getParams());
+            $this->getResponse()->setBody("Merchant Order not found");
+            $this->getResponse()->setHttpResponseCode(\MercadoPago\Core\Helper\Response::HTTP_NOT_FOUND);
         }
 
-        $this->coreHelper->log("Merchant Order not found", self::LOG_NAME, $request->getParams());
-        $this->getResponse()->setBody("Merchant Order not found");
-        $this->getResponse()->setHttpResponseCode(\MercadoPago\Core\Helper\Response::HTTP_NOT_FOUND);
+        $this->coreHelper->log("Http code", self::LOG_NAME, $this->getResponse()->getHttpResponseCode());
     }
 
 
