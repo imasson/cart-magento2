@@ -229,7 +229,7 @@ class Core
      *
      * @return \Magento\Sales\Model\Order
      */
-    protected function _getOrder($incrementId)
+    public function _getOrder($incrementId)
     {
         return $this->_orderFactory->create()->loadByIncrementId($incrementId);
     }
