@@ -9,4 +9,7 @@
     <event name="mercadopago_standard_make_preference_before">
         <observer name="setShipmentParams" instance="MercadoPago\MercadoEnvios\Observer\ShipmentParams" />
     </event>
+    <event name="controller_action_predispatch_shipping_tracking_popup">
+        <observer name="setShipmentParams" instance="MercadoPago\MercadoEnvios\Observer\TrackingPopup" />
+    </event>
 </config>

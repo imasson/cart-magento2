@@ -8,7 +8,7 @@ use Magento\Framework\Event\ObserverInterface;
  *
  * @package MercadoPago\Core\Observer
  */
-class ShipmentData
+class TrackingPopup
     implements ObserverInterface
 {
     /**
@@ -35,6 +35,13 @@ class ShipmentData
      */
     protected $configResource;
     protected $_timezone;
+    protected $_request;
+
+    /**
+     * @var \Magento\Shipping\Model\InfoFactory
+     */
+    protected $_shippingInfoFactory;
+    protected $_actionFlag;
 
     /**
      * ConfigObserver constructor.
@@ -49,7 +56,11 @@ class ShipmentData
         \Magento\Config\Model\ResourceModel\Config $configResource,
         \MercadoPago\Core\Model\Core $coreModel,
         \MercadoPago\MercadoEnvios\Helper\Data $shipmentHelper,
-        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timeZone
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timeZone,
+        \Magento\Framework\App\Request\Http $request,
+        \Magento\Shipping\Model\InfoFactory $shippingInfoFactory,
+        \Magento\Framework\App\ActionFlag $actionFlag
+
     )
     {
         $this->scopeConfig = $scopeConfig;
@@ -58,6 +69,11 @@ class ShipmentData
         $this->coreModel = $coreModel;
         $this->shipmentHelper = $shipmentHelper;
         $this->_timezone = $timeZone;
+        $this->_request = $request;
+        $this->_shippingInfoFactory = $shippingInfoFactory;
+        $this->_actionFlag = $actionFlag;
+
+
     }
 
     /**
@@ -68,31 +84,17 @@ class ShipmentData
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        $observerData = $observer->getData();
+        $shippingInfoModel = $this->_shippingInfoFactory->create()->loadByHash($this->_request->getParam('hash'));
 
-        $orderId = $observerData['orderId'];
-        $shipmentData = $observerData['shipmentData'];
-        $order = $this->coreModel->_getOrder($orderId);
+        if ($url = $this->shipmentHelper->getTrackingUrlByShippingInfo($shippingInfoModel)) {
+            $controller = $observer->getControllerAction();
+            $controller->getResponse()->setRedirect($url);
+            $this->_actionFlag->set('', \Magento\Framework\App\Action\Action::FLAG_NO_DISPATCH, true);
 
-        $method = $order->getShippingMethod();
-
-        if ($this->shipmentHelper->isMercadoEnviosMethod($method)) {
-            $methodId = $shipmentData['shipping_option']['shipping_method_id'];
-            $name = $shipmentData['shipping_option']['name'];
-            $order->setShippingMethod('mercadoenvios_' . $methodId);
-
-            $estimatedDate = $this->_timezone->formatDate($shipmentData['shipping_option']['estimated_delivery']['date']);
-            $estimatedDate = __('(estimated date %s)', $estimatedDate);
-            $shippingDescription = 'MercadoEnvíos - ' . $name . ' ' . $estimatedDate;
-            $order->setShippingDescription($shippingDescription);
-            try {
-                $order->save();
-                $this->shipmentHelper->log('Order ' . $order->getIncrementId() . ' shipping data set ', $shipmentData);
-            } catch (\Exception $e) {
-                $this->shipmentHelper->log("error when update shipment data: " . $e);
-                $this->shipmentHelper->log($e);
-            }
+            //$controller->setFlag('', 'no-dispatch', true);
         }
+
+        return $observer;
     }
 
 }

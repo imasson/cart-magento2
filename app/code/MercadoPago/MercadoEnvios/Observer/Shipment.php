@@ -109,7 +109,8 @@ class Shipment
                 $tracking['description'] = str_replace('#{trackingNumber}', $shipmentInfo->tracking_number, $serviceInfo->tracking_url);
                 $tracking['title'] = self::CODE;
 
-                $existingTracking = $this->_trackFactory->load($shipment->getOrderId(), 'order_id');
+                $existingTracking = $this->_trackFactory->create()->load($shipment->getOrderId(),'order_id');
+
                 if ($existingTracking->getId()) {
                     $track = $shipment->getTrackById($existingTracking->getId());
                     $track->setNumber($tracking['number'])
@@ -118,14 +119,16 @@ class Shipment
                         ->save();
                 } else {
                     $track = $this->_trackFactory->create()->addData($tracking);
+                    $track->setCarrierCode(\MercadoPago\MercadoEnvios\Model\Carrier\MercadoEnvios::CODE);
                     $shipment->addTrack($track);
+
+                    $shipment->save();
                 }
 
                 $this->coreHelper->log("Track added", 'mercadopago-notification.log', $track);
             }
 
             $this->_transaction
-                ->addObject($shipment->_shipment)
                 ->addObject($order)
                 ->save();
         }

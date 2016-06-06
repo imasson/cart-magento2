@@ -33,9 +33,11 @@ class Data
     protected $_productFactory;
 
     protected $_mpLogger;
+    protected $_mpHelper;
 
     protected $_helperItem;
     protected $_helperCarrier;
+    protected $_trackFactory;
 
     public static $enabled_methods = ['mla', 'mlb', 'mlm'];
 
@@ -46,7 +48,9 @@ class Data
         \Magento\Catalog\Model\ProductFactory $productFactory,
         \MercadoPago\MercadoEnvios\Helper\ItemData $helperItem,
         \MercadoPago\MercadoEnvios\Helper\CarrierData $helperCarrier,
-        \MercadoPago\Core\Logger\Logger $mpLogger
+        \MercadoPago\Core\Logger\Logger $mpLogger,
+        \MercadoPago\Core\Helper\Data $mpHelper,
+        \Magento\Sales\Model\Order\Shipment\TrackFactory $trackFactory
     )
     {
         parent::__construct($context);
@@ -55,6 +59,9 @@ class Data
         $this->_helperItem = $helperItem;
         $this->_helperCarrier = $helperCarrier;
         $this->_mpLogger = $mpLogger;
+        $this->_mpHelper = $mpHelper;
+        $this->_trackFactory = $trackFactory;
+
 
     }
 
@@ -144,7 +151,7 @@ class Data
 
     public function getTrackingUrlByShippingInfo($_shippingInfo)
     {
-        $tracking = Mage::getModel('sales/order_shipment_track');
+        $tracking = $this->_trackFactory->create();
         $tracking = $tracking->getCollection()
             ->addFieldToFilter(
                 ['entity_id', 'parent_id', 'order_id'],
@@ -158,13 +165,13 @@ class Data
             ->setCurPage(1)
             ->load();
 
-        foreach ($_shippingInfo->getTrackingInfo() as $track) {
-            $lastTrack = array_pop($track);
-            if (isset($lastTrack['title']) && $lastTrack['title'] == MercadoPago_MercadoEnvios_Model_Observer::CODE) {
-                $item = array_pop($tracking->getItems());
-                if ($item->getId()) {
-                    return $item->getDescription();
-                }
+        foreach ($tracking->getData() as $track) {
+            //$lastTrack = array_pop($track);
+            if (isset($track['carrier_code']) && $track['carrier_code'] == \MercadoPago\MercadoEnvios\Model\Carrier\MercadoEnvios::CODE) {
+                //$item = array_pop($tracking->getItems());
+                //if ($item->getId()) {
+                    return $track['description'];
+                //}
             }
         }
 
@@ -194,7 +201,7 @@ class Data
     {
         $client = new \Zend_Http_Client(self::ME_SHIPMENT_URL . $shipmentId);
         $client->setMethod(\Zend_Http_Client::GET);
-        $client->setParameterGet('access_token', Mage::helper('mercadopago')->getAccessToken());
+        $client->setParameterGet('access_token', $this->_mpHelper->getAccessToken());
 
         try {
             $response = $client->request();
@@ -227,7 +234,7 @@ class Data
         return '';
     }
 
-    public function log($message, $array = null, $level = \Zend_Log::ERR, $file = "mercadoenvios.log")
+    public function log($message, $array = null, $level = \Monolog\Logger::ALERT, $file = "mercadoenvios.log")
     {
         $actionLog = $this->scopeConfig->getValue('carriers/mercadoenvios/log',\Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         if (!$actionLog) {
