@@ -95,7 +95,6 @@ class Shipment
                 $shipment = $this->_shipmentFactory->create()->load($order->getId(), 'order_id');
             } else {
                 $shipment = $this->_shipment->create($order);
-                //$this->_shipmentFactory->prepareItems($shipment, $order);
                 $order->setIsInProcess(true);
             }
             $shipment->setShippingLabel($merchant_order['shipments'][0]['id']);

@@ -38,6 +38,8 @@ class Data
     protected $_helperItem;
     protected $_helperCarrier;
     protected $_trackFactory;
+    protected $_shipmentFactory;
+
 
     public static $enabled_methods = ['mla', 'mlb', 'mlm'];
 
@@ -50,7 +52,8 @@ class Data
         \MercadoPago\MercadoEnvios\Helper\CarrierData $helperCarrier,
         \MercadoPago\Core\Logger\Logger $mpLogger,
         \MercadoPago\Core\Helper\Data $mpHelper,
-        \Magento\Sales\Model\Order\Shipment\TrackFactory $trackFactory
+        \Magento\Sales\Model\Order\Shipment\TrackFactory $trackFactory,
+        \Magento\Sales\Model\ResourceModel\Order\Shipment\Collection $shipment
     )
     {
         parent::__construct($context);
@@ -61,7 +64,7 @@ class Data
         $this->_mpLogger = $mpLogger;
         $this->_mpHelper = $mpHelper;
         $this->_trackFactory = $trackFactory;
-
+        $this->_shipmentFactory = $shipment;
 
     }
 
@@ -181,12 +184,12 @@ class Data
     public function getTrackingPrintUrl($shipmentId)
     {
         if ($shipmentId) {
-            if ($shipment = Mage::getModel('sales/order_shipment')->load($shipmentId)) {
+            if ($shipment = $this->_shipmentFactory->load($shipmentId)) {
                 if ($shipment->getShippingLabel()) {
                     $params = [
                         'shipment_ids'  => $shipment->getShippingLabel(),
-                        'response_type' => Mage::getStoreConfig('carriers/mercadoenvios/shipping_label'),
-                        'access_token'  => Mage::helper('mercadopago')->getAccessToken()
+                        'response_type' => $this->scopeConfig->getValue('carriers/mercadoenvios/shipping_label'),
+                        'access_token'  => $this->_mpHelper->getAccessToken()
                     ];
 
                     return self::ME_SHIPMENT_LABEL_URL . '?' . http_build_query($params);

@@ -90,8 +90,6 @@ class TrackingPopup
             $controller = $observer->getControllerAction();
             $controller->getResponse()->setRedirect($url);
             $this->_actionFlag->set('', \Magento\Framework\App\Action\Action::FLAG_NO_DISPATCH, true);
-
-            //$controller->setFlag('', 'no-dispatch', true);
         }
 
         return $observer;

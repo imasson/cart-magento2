@@ -82,7 +82,7 @@ class ShipmentData
             $order->setShippingMethod('mercadoenvios_' . $methodId);
 
             $estimatedDate = $this->_timezone->formatDate($shipmentData['shipping_option']['estimated_delivery']['date']);
-            $estimatedDate = __('(estimated date %s)', $estimatedDate);
+            $estimatedDate = __('(estimated date %1)', $estimatedDate);
             $shippingDescription = 'MercadoEnvíos - ' . $name . ' ' . $estimatedDate;
             $order->setShippingDescription($shippingDescription);
             try {
