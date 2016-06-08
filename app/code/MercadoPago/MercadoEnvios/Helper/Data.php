@@ -53,7 +53,7 @@ class Data
         \MercadoPago\Core\Logger\Logger $mpLogger,
         \MercadoPago\Core\Helper\Data $mpHelper,
         \Magento\Sales\Model\Order\Shipment\TrackFactory $trackFactory,
-        \Magento\Sales\Model\ResourceModel\Order\Shipment\Collection $shipment
+        \Magento\Sales\Model\Order\Shipment $shipment
     )
     {
         parent::__construct($context);

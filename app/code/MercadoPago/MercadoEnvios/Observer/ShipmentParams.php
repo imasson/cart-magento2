@@ -91,7 +91,7 @@ class ShipmentParams
             $paramsME['cost'] = (float)$order->getBaseShippingAmount();
         }
         $observer->getParams()->setParams($paramsME);
-        $this->shipmentHelper->log('REQUEST SHIPMENT ME: ', $paramsME, \Zend_Log::INFO);
+        $this->shipmentHelper->log('REQUEST SHIPMENT ME: ', $paramsME);
 
         return $observer;
     }

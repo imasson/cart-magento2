@@ -131,7 +131,7 @@ class CarrierData
         return $value;
     }
 
-    public function log($message, $array = null, $level = \Zend_Log::ERR, $file = "mercadoenvios.log")
+    public function log($message, $array = null, $level = \Monolog\Logger::ALERT, $file = "mercadoenvios.log")
     {
         $actionLog = $this->scopeConfig->getValue('carriers/mercadoenvios/log',\Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         if (!$actionLog) {

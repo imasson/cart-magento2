@@ -24,20 +24,27 @@ class PluginBeforeView
 
     }
     
-    public function afterGetButtonList(\Magento\Backend\Block\Widget\Context $subject, $buttonList) {
-
+    public function afterGetShipment(\Magento\Shipping\Block\Adminhtml\View $subject){
         if ($subject->getRequest()->getFullActionName() == 'adminhtml_order_shipment_view') {
-            $buttonList->add(
-                'custom_button',
-                [
-                    'label'   => 'Print shipping label',
-                    'onclick' => 'window.open(\' ' . $this->shipmentHelper->getTrackingPrintUrl($subject->getRequest()->getParam('shipment_id')) . '\')',
-                    'class'   => 'go'
-                ]
-            );
-        }
+//            $subject->addButton(
+//                'custom_button',
+//                [
+//                    'label'   => 'Print shipping label',
+//                    'onclick' => 'window.open(\' ' . $this->shipmentHelper->getTrackingPrintUrl($subject->getRequest()->getParam('shipment_id')) . '\')',
+//                    'class'   => 'go'
+//                ]
+//            );
+//            $subject->addButton(
+//                'print',
+//                [
+//                    'label' => __('Print'),
+//                    'class' => 'save',
+//                    'onclick' => 'setLocation(\'' . 'xxxxxxxx'. '\')'
+//                ]
+//           );
+       }
 
-        return $buttonList;
-    }
+   //     return null;
+   }
 
 }
