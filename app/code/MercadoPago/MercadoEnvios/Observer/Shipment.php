@@ -4,70 +4,71 @@ namespace MercadoPago\MercadoEnvios\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
 /**
- * Class ConfigObserver
+ * Class Shipment
  *
- * @package MercadoPago\Core\Observer
+ * @package MercadoPago\MercadoEnvios\Observer
  */
 class Shipment
     implements ObserverInterface
 {
-
     /**
      *
      */
-    const LOG_NAME = 'mercadopago';
     const CODE = 'MercadoEnvios';
 
     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     * @var \MercadoPago\Core\Helper\Data
      */
-    protected $scopeConfig;
-
+    protected $_coreHelper;
     /**
-     * @var \MercadoPago\Core\Helper\
+     * @var \MercadoPago\Core\Model\Core
      */
-    protected $coreHelper;
-    protected $coreModel;
-    protected $shipmentHelper;
-
+    protected $_coreModel;
     /**
-     * Config configResource
-     *
-     * @var $configResource
+     * @var \MercadoPago\MercadoEnvios\Helper\Data
      */
-    protected $configResource;
-    protected $_timezone;
+    protected $_shipmentHelper;
+    /**
+     * @var \Magento\Sales\Model\Order\ShipmentFactory
+     */
     protected $_shipmentFactory;
+    /**
+     * @var \Magento\Sales\Model\Order\Shipment
+     */
     protected $_shipment;
+    /**
+     * @var \Magento\Sales\Model\Order\Shipment\TrackFactory
+     */
     protected $_trackFactory;
+    /**
+     * @var \Magento\Framework\DB\Transaction
+     */
     protected $_transaction;
 
     /**
-     * ConfigObserver constructor.
+     * Shipment constructor.
      *
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \MercadoPago\Core\Helper\Data                      $coreHelper
-     * @param \Magento\Config\Model\ResourceModel\Config         $configResource
+     * @param \MercadoPago\Core\Helper\Data                    $coreHelper
+     * @param \MercadoPago\Core\Model\Core                     $coreModel
+     * @param \MercadoPago\MercadoEnvios\Helper\Data           $shipmentHelper
+     * @param \Magento\Sales\Model\Order\Shipment              $shipment
+     * @param \Magento\Sales\Model\Order\ShipmentFactory       $shipmentFactory
+     * @param \Magento\Sales\Model\Order\Shipment\TrackFactory $trackFactory
+     * @param \Magento\Framework\DB\Transaction                $transaction
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \MercadoPago\Core\Helper\Data $coreHelper,
-        \Magento\Config\Model\ResourceModel\Config $configResource,
         \MercadoPago\Core\Model\Core $coreModel,
         \MercadoPago\MercadoEnvios\Helper\Data $shipmentHelper,
-        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timeZone,
-        \Magento\Sales\Model\ResourceModel\Order\ShipmentFactory $shipmentFactory,
-        \Magento\Sales\Model\Order\ShipmentFactory $shipment,
+        \Magento\Sales\Model\Order\Shipment $shipment,
+        \Magento\Sales\Model\Order\ShipmentFactory $shipmentFactory,
         \Magento\Sales\Model\Order\Shipment\TrackFactory $trackFactory,
         \Magento\Framework\DB\Transaction $transaction
     )
     {
-        $this->scopeConfig = $scopeConfig;
-        $this->configResource = $configResource;
-        $this->coreHelper = $coreHelper;
-        $this->coreModel = $coreModel;
-        $this->shipmentHelper = $shipmentHelper;
-        $this->_timezone = $timeZone;
+        $this->_coreHelper = $coreHelper;
+        $this->_coreModel = $coreModel;
+        $this->_shipmentHelper = $shipmentHelper;
         $this->_shipmentFactory = $shipmentFactory;
         $this->_shipment = $shipment;
         $this->_trackFactory = $trackFactory;
@@ -75,40 +76,40 @@ class Shipment
     }
 
     /**
-     * Updates configuration values based every time MercadoPago configuration section is saved
      * @param \Magento\Framework\Event\Observer $observer
      *
-     * @return $this
+     * @throws \Exception
+     * @throws bool
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        $merchant_order = $observer->getMerchantOrder();
-        if (!count($merchant_order['shipments']) > 0) {
+        $merchantOrder = $observer->getMerchantOrder();
+        if (!count($merchantOrder['shipments']) > 0) {
             return;
         }
         $data = $observer->getPayment();
-        $order = $this->coreModel->_getOrder($data["external_reference"]);
+        $order = $this->_coreModel->_getOrder($data["external_reference"]);
 
         //if order has shipments, status is updated. If it doesn't the shipment is created.
-        if ($merchant_order['shipments'][0]['status'] == 'ready_to_ship') {
+        if ($merchantOrder['shipments'][0]['status'] == 'ready_to_ship') {
             if ($order->hasShipments()) {
-                $shipment = $this->_shipmentFactory->create()->load($order->getId(), 'order_id');
+                $shipment = $this->_shipment->load($order->getId(), 'order_id');
             } else {
-                $shipment = $this->_shipment->create($order);
+                $shipment = $this->_shipmentFactory->create($order);
                 $order->setIsInProcess(true);
             }
-            $shipment->setShippingLabel($merchant_order['shipments'][0]['id']);
+            $shipment->setShippingLabel($merchantOrder['shipments'][0]['id']);
 
-            $shipmentInfo = $this->shipmentHelper->getShipmentInfo($merchant_order['shipments'][0]['id']);
-            $this->coreHelper->log("Shipment Info", 'mercadopago-notification.log', $shipmentInfo);
-            $serviceInfo = $this->shipmentHelper->getServiceInfo($merchant_order['shipments'][0]['service_id'], $merchant_order['site_id']);
-            $this->coreHelper->log("Service Info by service id", 'mercadopago-notification.log', $serviceInfo);
+            $shipmentInfo = $this->_shipmentHelper->getShipmentInfo($merchantOrder['shipments'][0]['id']);
+            $this->_coreHelper->log("Shipment Info", 'mercadopago-notification.log', $shipmentInfo);
+            $serviceInfo = $this->_shipmentHelper->getServiceInfo($merchantOrder['shipments'][0]['service_id'], $merchantOrder['site_id']);
+            $this->_coreHelper->log("Service Info by service id", 'mercadopago-notification.log', $serviceInfo);
             if ($shipmentInfo && isset($shipmentInfo->tracking_number)) {
                 $tracking['number'] = $shipmentInfo->tracking_number;
                 $tracking['description'] = str_replace('#{trackingNumber}', $shipmentInfo->tracking_number, $serviceInfo->tracking_url);
                 $tracking['title'] = self::CODE;
 
-                $existingTracking = $this->_trackFactory->create()->load($shipment->getOrderId(),'order_id');
+                $existingTracking = $this->_trackFactory->create()->load($shipment->getOrderId(), 'order_id');
 
                 if ($existingTracking->getId()) {
                     $track = $shipment->getTrackById($existingTracking->getId());
@@ -124,7 +125,7 @@ class Shipment
                     $shipment->save();
                 }
 
-                $this->coreHelper->log("Track added", 'mercadopago-notification.log', $track);
+                $this->_coreHelper->log("Track added", 'mercadopago-notification.log', $track);
             }
 
             $this->_transaction

@@ -5,21 +5,44 @@ namespace MercadoPago\MercadoEnvios\Helper;
 /**
  * Class Data
  *
- * @package MercadoPago\Core\Helper
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @package MercadoPago\MercadoEnvios\Helper
  */
 class Data
     extends \Magento\Framework\App\Helper\AbstractHelper
 {
 
+    /**
+     *
+     */
     const XML_PATH_ATTRIBUTES_MAPPING = 'carriers/mercadoenvios/attributesmapping';
+    /**
+     *
+     */
     const ME_LENGTH_UNIT = 'cm';
+    /**
+     *
+     */
     const ME_WEIGHT_UNIT = 'gr';
+    /**
+     *
+     */
     const ME_SHIPMENT_URL = 'https://api.mercadolibre.com/shipments/';
+    /**
+     *
+     */
     const ME_SHIPMENT_LABEL_URL = 'https://api.mercadolibre.com/shipment_labels';
+    /**
+     *
+     */
     const ME_SHIPMENT_TRACKING_URL = 'https://api.mercadolibre.com/sites/';
 
+    /**
+     * @var
+     */
     protected $_mapping;
+    /**
+     * @var array
+     */
     protected $_products = [];
 
     /**
@@ -32,96 +55,94 @@ class Data
      */
     protected $_productFactory;
 
+    /**
+     * @var \MercadoPago\Core\Logger\Logger
+     */
     protected $_mpLogger;
+    /**
+     * @var \MercadoPago\Core\Helper\Data
+     */
     protected $_mpHelper;
 
+    /**
+     * @var ItemData
+     */
     protected $_helperItem;
-    protected $_helperCarrier;
+
+    /**
+     * @var \Magento\Sales\Model\Order\Shipment\TrackFactory
+     */
     protected $_trackFactory;
-    protected $_shipmentFactory;
+    /**
+     * @var \Magento\Sales\Model\Order\Shipment
+     */
+    protected $_shipment;
 
 
+    /**
+     * @var array
+     */
     public static $enabled_methods = ['mla', 'mlb', 'mlm'];
 
 
+    /**
+     * @var \Magento\Framework\Registry
+     */
+    protected $_registry;
+
+    /**
+     * Data constructor.
+     *
+     * @param \Magento\Framework\App\Helper\Context            $context
+     * @param \Magento\Checkout\Model\Session                  $checkoutSession
+     * @param \Magento\Catalog\Model\ProductFactory            $productFactory
+     * @param ItemData                                         $helperItem
+     * @param \MercadoPago\Core\Logger\Logger                  $mpLogger
+     * @param \MercadoPago\Core\Helper\Data                    $mpHelper
+     * @param \Magento\Sales\Model\Order\Shipment\TrackFactory $trackFactory
+     * @param \Magento\Sales\Model\Order\Shipment              $shipment
+     */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Catalog\Model\ProductFactory $productFactory,
         \MercadoPago\MercadoEnvios\Helper\ItemData $helperItem,
-        \MercadoPago\MercadoEnvios\Helper\CarrierData $helperCarrier,
         \MercadoPago\Core\Logger\Logger $mpLogger,
         \MercadoPago\Core\Helper\Data $mpHelper,
         \Magento\Sales\Model\Order\Shipment\TrackFactory $trackFactory,
-        \Magento\Sales\Model\Order\Shipment $shipment
+        \Magento\Sales\Model\Order\Shipment $shipment,
+        \Magento\Framework\Registry $registry
     )
     {
         parent::__construct($context);
         $this->_checkoutSession = $checkoutSession;
         $this->_productFactory = $productFactory;
         $this->_helperItem = $helperItem;
-        $this->_helperCarrier = $helperCarrier;
         $this->_mpLogger = $mpLogger;
         $this->_mpHelper = $mpHelper;
         $this->_trackFactory = $trackFactory;
-        $this->_shipmentFactory = $shipment;
+        $this->_shipment = $shipment;
+        $this->_registry = $registry;
 
     }
 
-
-    /**
-     * @param $quote Mage_Sales_Model_Quote
-     */
-    public function getDimensions($items)
-    {
-        $width = 0;
-        $height = 0;
-        $length = 0;
-        $weight = 0;
-        $bulk = 0;
-        foreach ($items as $item) {
-            $tempWidth = $this->_helperCarrier->_getShippingDimension($item, 'width');
-            $tempHeight = $this->_helperCarrier->_getShippingDimension($item, 'height');
-            $tempLength = $this->_helperCarrier->_getShippingDimension($item, 'length');
-            $tempWeight = $this->_helperCarrier->_getShippingDimension($item, 'weight');
-            $qty = $this->_helperItem->itemGetQty($item);
-            $bulk += ($tempWidth * $tempHeight * $tempLength) * $qty;
-            $width += $tempWidth * $qty;
-            $height += $tempHeight * $qty;
-            $length += $tempLength * $qty;
-            $weight += $tempWeight * $qty;
-        }
-        $height = ceil($height);
-        $width = ceil($width);
-        $length = ceil($length);
-        $weight = ceil($weight);
-
-        $this->_helperCarrier->validateCartDimension($height, $width, $length, $weight);
-        $bulk = ceil(pow($bulk, 1/3));
-
-        return $bulk . 'x' . $bulk . 'x' . $bulk . ',' . $weight;
-
-    }
+    
 
     /**
      * Retrieves Quote
-     *
-     * @param integer $quoteId
      *
      * @return \Magento\Quote\Model\Quote
      */
     public function getQuote()
     {
-//        if (Mage::app()->getStore()->isAdmin()) {
-//            $quote = Mage::getSingleton('adminhtml/session_quote')->getQuote();
-//        } else {
-//            $quote = Mage::getModel('checkout/cart')->getQuote();
-//        }
-
         return $this->_checkoutSession->getQuote();
-
     }
 
+    /**
+     * @param $method
+     *
+     * @return bool
+     */
     public function isMercadoEnviosMethod($method)
     {
         $shippingMethod = substr($method, 0, strpos($method, '_'));
@@ -130,7 +151,11 @@ class Data
     }
 
 
-
+    /**
+     * @param $request
+     *
+     * @return mixed|null
+     */
     public function getFreeMethod($request)
     {
         $freeMethod = $this->scopeConfig->getValue('carriers/mercadoenvios/free_method',\Magento\Store\Model\ScopeInterface::SCOPE_STORE);
@@ -147,11 +172,19 @@ class Data
         return null;
     }
 
+    /**
+     * @return bool
+     */
     public function isCountryEnabled()
     {
         return (in_array($this->scopeConfig->getValue('payment/mercadopago/country',\Magento\Store\Model\ScopeInterface::SCOPE_STORE), self::$enabled_methods));
     }
 
+    /**
+     * @param $_shippingInfo
+     *
+     * @return string
+     */
     public function getTrackingUrlByShippingInfo($_shippingInfo)
     {
         $tracking = $this->_trackFactory->create();
@@ -169,22 +202,23 @@ class Data
             ->load();
 
         foreach ($tracking->getData() as $track) {
-            //$lastTrack = array_pop($track);
             if (isset($track['carrier_code']) && $track['carrier_code'] == \MercadoPago\MercadoEnvios\Model\Carrier\MercadoEnvios::CODE) {
-                //$item = array_pop($tracking->getItems());
-                //if ($item->getId()) {
                     return $track['description'];
-                //}
             }
         }
 
         return '';
     }
 
+    /**
+     * @param $shipmentId
+     *
+     * @return string
+     */
     public function getTrackingPrintUrl($shipmentId)
     {
         if ($shipmentId) {
-            if ($shipment = $this->_shipmentFactory->load($shipmentId)) {
+            if ($shipment = $this->_shipment->load($shipmentId)) {
                 if ($shipment->getShippingLabel()) {
                     $params = [
                         'shipment_ids'  => $shipment->getShippingLabel(),
@@ -200,6 +234,13 @@ class Data
         return '';
     }
 
+    /**
+     * @param $shipmentId
+     *
+     * @return mixed
+     * @throws \Exception
+     * @throws \Zend_Http_Client_Exception
+     */
     public function getShipmentInfo($shipmentId)
     {
         $client = new \Zend_Http_Client(self::ME_SHIPMENT_URL . $shipmentId);
@@ -216,6 +257,14 @@ class Data
         return json_decode($response->getBody());
     }
 
+    /**
+     * @param $serviceId
+     * @param $country
+     *
+     * @return string
+     * @throws \Exception
+     * @throws \Zend_Http_Client_Exception
+     */
     public function getServiceInfo($serviceId, $country)
     {
         $client = new \Zend_Http_Client(self::ME_SHIPMENT_TRACKING_URL . $country . '/shipping_services');
@@ -237,6 +286,12 @@ class Data
         return '';
     }
 
+    /**
+     * @param        $message
+     * @param null   $array
+     * @param int    $level
+     * @param string $file
+     */
     public function log($message, $array = null, $level = \Monolog\Logger::ALERT, $file = "mercadoenvios.log")
     {
         $actionLog = $this->scopeConfig->getValue('carriers/mercadoenvios/log',\Magento\Store\Model\ScopeInterface::SCOPE_STORE);

@@ -4,67 +4,46 @@ namespace MercadoPago\MercadoEnvios\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
 /**
- * Class ConfigObserver
+ * Class ShipmentData
  *
- * @package MercadoPago\Core\Observer
+ * @package MercadoPago\MercadoEnvios\Observer
  */
 class ShipmentData
     implements ObserverInterface
 {
     /**
-     *
+     * @var \MercadoPago\Core\Model\Core
      */
-    const LOG_NAME = 'mercadopago';
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $scopeConfig;
-
-    /**
-     * @var \MercadoPago\Core\Helper\
-     */
-    protected $coreHelper;
     protected $coreModel;
-    protected $shipmentHelper;
-
     /**
-     * Config configResource
-     *
-     * @var $configResource
+     * @var \MercadoPago\MercadoEnvios\Helper\Data
      */
-    protected $configResource;
+    protected $shipmentHelper;
+    /**
+     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
+     */
     protected $_timezone;
 
     /**
-     * ConfigObserver constructor.
+     * ShipmentData constructor.
      *
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \MercadoPago\Core\Helper\Data                      $coreHelper
-     * @param \Magento\Config\Model\ResourceModel\Config         $configResource
+     * @param \MercadoPago\Core\Model\Core                         $coreModel
+     * @param \MercadoPago\MercadoEnvios\Helper\Data               $shipmentHelper
+     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timeZone
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \MercadoPago\Core\Helper\Data $coreHelper,
-        \Magento\Config\Model\ResourceModel\Config $configResource,
         \MercadoPago\Core\Model\Core $coreModel,
         \MercadoPago\MercadoEnvios\Helper\Data $shipmentHelper,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timeZone
     )
     {
-        $this->scopeConfig = $scopeConfig;
-        $this->configResource = $configResource;
-        $this->coreHelper = $coreHelper;
         $this->coreModel = $coreModel;
         $this->shipmentHelper = $shipmentHelper;
         $this->_timezone = $timeZone;
     }
 
     /**
-     * Updates configuration values based every time MercadoPago configuration section is saved
      * @param \Magento\Framework\Event\Observer $observer
-     *
-     * @return $this
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {

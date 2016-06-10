@@ -1,50 +1,47 @@
 <?php
 namespace MercadoPago\MercadoEnvios\Plugin;
 
+/**
+ * Class PluginBeforeView
+ *
+ * @package MercadoPago\MercadoEnvios\Plugin
+ */
 class PluginBeforeView
 {
 
+    /**
+     * @var \MercadoPago\MercadoEnvios\Helper\Data
+     */
     protected $_shipmentHelper;
-    protected $_shipmentFactory;
 
     /**
      * PluginBeforeView constructor.
      *
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \MercadoPago\Core\Helper\Data                      $coreHelper
-     * @param \Magento\Config\Model\ResourceModel\Config         $configResource
+     * @param \MercadoPago\MercadoEnvios\Helper\Data $shipmentHelper
      */
     public function __construct(
-        \MercadoPago\MercadoEnvios\Helper\Data $shipmentHelper,
-        \Magento\Sales\Model\ResourceModel\Order\ShipmentFactory $shipmentFactory
+        \MercadoPago\MercadoEnvios\Helper\Data $shipmentHelper
     )
     {
-        $this->shipmentHelper = $shipmentHelper;
-        $this->_shipmentFactory = $shipmentFactory;
-
+        $this->_shipmentHelper = $shipmentHelper;
     }
-    
-    public function afterGetShipment(\Magento\Shipping\Block\Adminhtml\View $subject){
-        if ($subject->getRequest()->getFullActionName() == 'adminhtml_order_shipment_view') {
-//            $subject->addButton(
-//                'custom_button',
-//                [
-//                    'label'   => 'Print shipping label',
-//                    'onclick' => 'window.open(\' ' . $this->shipmentHelper->getTrackingPrintUrl($subject->getRequest()->getParam('shipment_id')) . '\')',
-//                    'class'   => 'go'
-//                ]
-//            );
-//            $subject->addButton(
-//                'print',
-//                [
-//                    'label' => __('Print'),
-//                    'class' => 'save',
-//                    'onclick' => 'setLocation(\'' . 'xxxxxxxx'. '\')'
-//                ]
-//           );
-       }
 
-   //     return null;
-   }
+    /**
+     * @param \Magento\Shipping\Block\Adminhtml\View $subject
+     */
+    public function beforeGetBackUrl(\Magento\Shipping\Block\Adminhtml\View $subject)
+    {
+
+        if ($subject->getRequest()->getFullActionName() == 'adminhtml_order_shipment_view' && $this->_shipmentHelper->isMercadoEnviosMethod($subject->getShipment()->getOrder()->getShippingMethod())) {
+            $subject->addButton(
+                'custom_button',
+                [
+                    'label'   => 'Print shipping label',
+                    'onclick' => 'window.open(\' ' . $this->_shipmentHelper->getTrackingPrintUrl($subject->getRequest()->getParam('shipment_id')) . '\')',
+                    'class'   => 'go'
+                ]
+            );
+        }
+    }
 
 }
