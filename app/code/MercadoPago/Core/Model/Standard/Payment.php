@@ -108,6 +108,11 @@ class Payment
     protected $_urlBuilder;
 
     /**
+     * @var string
+     */
+    protected $_infoBlockType = 'MercadoPago\Core\Block\Info';
+
+    /**
      * @param \MercadoPago\Core\Helper\Data                                $helperData
      * @param \Magento\Catalog\Helper\Image                                $helperImage
      * @param \Magento\Checkout\Model\Session                              $checkoutSession
