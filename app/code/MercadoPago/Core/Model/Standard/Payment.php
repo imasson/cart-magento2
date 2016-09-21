@@ -248,10 +248,10 @@ class Payment
         $this->_calculateDiscountAmount($arr['items'], $order);
         $this->_calculateBaseTaxAmount($arr['items'], $order);
         $total_item = $this->getTotalItems($arr['items']);
-        $total_item += (float)$order->getBaseShippingAmount();
-        $order_amount = (float)$order->getBaseGrandTotal();
+        $total_item += (float)$order->getShippingAmount();
+        $order_amount = (float)$order->getGrandTotal();
         if (!$order_amount) {
-            $order_amount = (float)$order->getBasePrice() + $order->getBaseShippingAmount();
+            $order_amount = (float)$order->getBaseGrandTotal() + $order->getBaseShippingAmount();
         }
 
         if ($total_item > $order_amount || $total_item < $order_amount) {
@@ -330,7 +330,7 @@ class Payment
         $paramsShipment = $params->getParams();
         if (empty($paramsShipment)) {
             $paramsShipment = $params->getData();
-            $paramsShipment['cost'] = (float)$order->getBaseShippingAmount();
+            $paramsShipment['cost'] = (float)$order->getShippingAmount();
             $paramsShipment['mode'] = 'custom';
         }
         $paramsShipment['receiver_address'] = $this->getReceiverAddress($shippingAddress);
@@ -390,13 +390,13 @@ class Payment
      */
     protected function _calculateBaseTaxAmount(&$arr, $order)
     {
-        if ($order->getBaseTaxAmount() > 0) {
+        if ($order->getTaxAmount() > 0) {
             $arr[] = [
                 "title"       => "Store taxes",
                 "description" => "Store taxes",
                 "category_id" => $this->_scopeConfig->getValue('payment/mercadopago/category_id', \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
                 "quantity"    => 1,
-                "unit_price"  => (float)$order->getBaseTaxAmount()
+                "unit_price"  => (float)$order->getTaxAmount()
             ];
         }
     }

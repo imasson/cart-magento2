@@ -231,7 +231,12 @@ class Core
      */
     public function _getOrder($incrementId)
     {
-        return $this->_orderFactory->create()->loadByIncrementId($incrementId);
+        $order = $this->_orderFactory->create()->loadByIncrementId($incrementId);
+        if ($order->getId()) {
+            return $order;
+        } else {
+            return $this->_orderFactory->create()->loadByAttribute('quote_id', $incrementId);
+        }
     }
 
     /**
@@ -460,7 +465,7 @@ class Core
         $preference['notification_url'] = $this->_urlBuilder->getUrl('mercadopago/notifications/custom');
         $preference['description'] = __("Order # %1 in store %2", $orderId, $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_LINK));
         $preference['transaction_amount'] = (float)$this->getAmount($quote);
-        $preference['external_reference'] = $orderId;
+        $preference['external_reference'] = $quote->getId();
         $preference['payer']['email'] = $customerInfo['email'];
 
         if (!empty($payment_info['identification_type'])) {
@@ -664,7 +669,7 @@ class Core
         if (!$quote) {
             $quote = $this->_getQuote();
         }
-        $total = $quote->getBaseSubtotalWithDiscount() + $quote->getShippingAddress()->getShippingAmount() + $quote->getShippingAddress()->getBaseTaxAmount();
+        $total = $quote->getSubtotalWithDiscount() + $quote->getShippingAddress()->getShippingAmount() + $quote->getShippingAddress()->getTaxAmount();
 
         return (float)$total;
 

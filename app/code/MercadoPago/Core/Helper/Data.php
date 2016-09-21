@@ -340,34 +340,35 @@ class Data
             $balance = $data['transaction_details']['total_paid_amount'];
         }
 
-        if (isset($data['shipping_cost'])) {
-            $shippingCost = $this->_getMultiCardValue($data, 'shipping_cost');
-            $order->setBaseShippingAmount($shippingCost);
-            $order->setShippingAmount($shippingCost);
-        } else {
-            $shippingCost = 0;
-        }
+        $baseCurrency = $order->getBaseCurrency();
+        $rate = $baseCurrency->getRate($data['currency_id']);
+        $shippingCost = $this->_getMultiCardValue($data, 'shipping_cost');
+
+        $baseShippingCost = $shippingCost / $rate;
+        $baseBalance = $balance / $rate;
 
         $order->setGrandTotal($balance);
-        $order->setBaseGrandTotal($balance);
-        if ($shippingCost > 0) {
+        $order->setBaseGrandTotal($baseBalance);
+        if ($baseShippingCost > 0) {
             $order->setBaseShippingAmount($shippingCost);
-            $order->setShippingAmount($shippingCost);
+            $order->setShippingAmount($baseShippingCost);
         }
 
         $couponAmount = $this->_getMultiCardValue($data, 'coupon_amount');
+        $baseCouponAmount = $couponAmount / $rate;
         $transactionAmount = $this->_getMultiCardValue($data, 'transaction_amount');
         if ($couponAmount) {
             $order->setDiscountCouponAmount($couponAmount * -1);
-            $order->setBaseDiscountCouponAmount($couponAmount * -1);
+            $order->setBaseDiscountCouponAmount($baseCouponAmount * -1);
             $balance = $balance - ($transactionAmount - $couponAmount + $shippingCost);
         } else {
             $balance = $balance - $transactionAmount - $shippingCost;
         }
 
+        $baseFinanceCost = $balance / $rate;
         if (\Zend_Locale_Math::round($balance, 4) > 0) {
             $order->setFinanceCostAmount($balance);
-            $order->setBaseFinanceCostAmount($balance);
+            $order->setBaseFinanceCostAmount($baseFinanceCost);
         }
 
         $order->save();
