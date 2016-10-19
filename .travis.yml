@@ -72,7 +72,7 @@ before_script:
   - composer install --no-interaction
   - mkdir tmp
   - mysql -e "DROP DATABASE IF EXISTS ${MAGENTO_DB_NAME}; CREATE DATABASE ${MAGENTO_DB_NAME};"
-  - curl "http://${MAGENTO_URL}/push-it-messenger-bag.html" > /tmp/output.txt
+  - curl "http://mercadopago2.local/" > /tmp/output.txt
   - cat /tmp/output.txt
   - sudo chown -R :www-data .
   - sudo find . -type d -exec chmod 770 {} \; && sudo find . -type f -exec chmod 660 {} \; && sudo chmod u+x bin/magento
