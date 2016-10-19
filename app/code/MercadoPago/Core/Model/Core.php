@@ -757,6 +757,7 @@ class Core
 
 
             } elseif ($status == 'refunded' || $status == 'cancelled') {
+                $order->setExternalRequest(true);
                 $order->cancel();
             }
 
@@ -808,7 +809,7 @@ class Core
                 $additionalFields = array(
                     'status',
                     'status_detail',
-                    'payment_id',
+                    'id',
                     'transaction_amount',
                     'cardholderName',
                     'installments',

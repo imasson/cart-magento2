@@ -13,7 +13,7 @@
     "php": ">=5.5.0"
   },
   "require-dev": {
-    "behat/behat": "3.0.15",
+    "behat/behat": "*",
     "bex/behat-magento2-init": "*",
     "behat/mink-extension": "*",
     "behat/mink-goutte-driver": "*",
