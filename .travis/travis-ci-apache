@@ -1,30 +1,29 @@
 <VirtualHost *:80>
-    ServerName mercadopago2.local
-    DocumentRoot %TRAVIS_BUILD_DIR%/htdocs/
-    ServerAlias www.mercadopago2.local
+  # [...]
 
-    <Directory "%TRAVIS_BUILD_DIR%">
-        Options FollowSymLinks MultiViews ExecCGI
-        AllowOverride All
-        Order deny,allow
-        Allow from all
-        Require all granted
-        Satisfy Any
-    </Directory>
+  <Directory "%TRAVIS_BUILD_DIR%">
+    Options FollowSymLinks MultiViews ExecCGI
+    AllowOverride All
+    Order deny,allow
+    Allow from all
+    Require all granted
+  </Directory>
 
-    ErrorLog ${APACHE_LOG_DIR}/errorcart.log
-    CustomLog ${APACHE_LOG_DIR}/accesscart.log combined
-
-    # Wire up Apache to use Travis CI's php-fpm.
-    <IfModule mod_fastcgi.c>
+  # Wire up Apache to use Travis CI's php-fpm.
+  <IfModule mod_fastcgi.c>
     <Directory /usr/lib/cgi-bin>
-            Require all granted
-        </Directory>
+        Require all granted
+    </Directory>
+    AddHandler php5-fcgi .php
+    Action php5-fcgi /php5-fcgi
+    Alias /php5-fcgi /usr/lib/cgi-bin/php5-fcgi
+    FastCgiExternalServer /usr/lib/cgi-bin/php5-fcgi -host 127.0.0.1:9000 -pass-header Authorization
+  </IfModule>
 
-        AddHandler php5-fcgi .php
-        Action php5-fcgi /php5-fcgi
-        Alias /php5-fcgi /usr/lib/cgi-bin/php5-fcgi
-        FastCgiExternalServer /usr/lib/cgi-bin/php5-fcgi -host 127.0.0.1:9000 -pass-header Authorization
-    </IfModule>
+  ServerName magento-2-travis.dev
+  ServerAlias www.magento-2-travis.dev
+  DocumentRoot %TRAVIS_BUILD_DIR%/magento2/pub
+
+
+  # [...]
 </VirtualHost>
-
