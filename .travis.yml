@@ -92,5 +92,5 @@ script:
   - vendor/bin/phpcpd ../../../MercadoPago --exclude=Test
   - curl "http://${MAGENTO_URL}/push-it-messenger-bag.html" > /tmp/output.txt
   - cat /tmp/output.txt
-  - ls /var/log/apache
+  - ls /var/log/apache2
   - vendor/bin/behat --config behat.yml --tags ${BEHAT_TAG} --tags="~@skip"
