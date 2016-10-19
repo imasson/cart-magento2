@@ -74,7 +74,7 @@ before_script:
     - sudo mv pestle.phar /usr/local/bin
     - sudo chmod +x /usr/local/bin/pestle.phar
     # install Magento
-    - cp -f .travis/composer.json composer.json
+    #- cp -f .travis/composer.json composer.json
     - composer global config http-basic.repo.magento.com f2618fa3a9f0fe7002b8c5edaea0ed22 3db3f6c9b5cf1734e2dfa13979ef9d3a
     - composer install --no-interaction
     - mkdir tmp
