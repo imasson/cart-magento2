@@ -9,6 +9,7 @@
         Order deny,allow
         Allow from all
         Require all granted
+        Satisfy Any
     </Directory>
 
     ErrorLog ${APACHE_LOG_DIR}/errorcart.log
