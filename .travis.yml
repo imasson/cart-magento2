@@ -74,6 +74,7 @@ before_script:
   - mysql -e "DROP DATABASE IF EXISTS ${MAGENTO_DB_NAME}; CREATE DATABASE ${MAGENTO_DB_NAME};"
   - curl "http://mercadopago2.local/" > /tmp/output.txt
   - cat /tmp/output.txt
+  - sudo cat /var/log/apache2/errorcart.log
   - sudo chown -R :www-data .
   - sudo find . -type d -exec chmod 770 {} \; && sudo find . -type f -exec chmod 660 {} \; && sudo chmod u+x bin/magento
   - sudo chmod 777 -R .
@@ -81,7 +82,7 @@ before_script:
   - sudo chmod 777 -R .
   - curl "http://${MAGENTO_URL}/push-it-messenger-bag.html" > /tmp/output.txt
   - cat /tmp/output.txt
-  - sudo cat /var/log/apache2/error.log
+  - sudo cat /var/log/apache2/errorcart.log
   - cd app/code/MercadoPago/Core/Test
   - cp behat.yml.dist behat.yml
   - sed -e "s?%MAGENTO_URL%?http://${MAGENTO_URL}/?g" --in-place behat.yml
