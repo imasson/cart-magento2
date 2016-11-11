@@ -84,6 +84,7 @@ before_script:
     - cd app/code/MercadoPago/Core/Test
     - curl http://magento-2-travis.dev/ > /tmp/pepe.log
     - sudo cat /tmp/pepe.log
+    - sudo find /var/log/apache2 -exec cat '{}' \;
     #- cp behat.yml.dist behat.yml
     #- sed -e "s?%MAGENTO_URL%?http://${MAGENTO_URL}/?g" --in-place behat.yml
     #- sed -e "s?%BROWSER_DRIVER%?firefox?g" --in-place behat.yml
