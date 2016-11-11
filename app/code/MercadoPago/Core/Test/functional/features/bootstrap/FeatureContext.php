@@ -326,6 +326,15 @@ class FeatureContext
     }
 
     /**
+     * @When I test
+     */
+    public function iTest()
+    {
+        $page = $this->getSession()->getPage();
+        var_dump($page->getHtml());
+    }
+
+    /**
      * @When I am logged in MP as :arg1 :arg2
      */
     public function iAmLoggedInMPAs($arg1, $arg2)

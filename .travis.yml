@@ -88,10 +88,10 @@ before_script:
     - sudo find . -type d -exec chmod 770 {} \; && sudo find . -type f -exec chmod 660 {} \; && sudo chmod u+x bin/magento
     - bin/magento setup:install --backend-frontname=admin --db-host=localhost --db-name=magento_2_travis --db-user root --base-url=http://magento-2-travis.dev/ --use-secure-admin=0 --admin-user=admin --admin-password=MercadoPago2016 --admin-email=fcapua@summasolutions.net --admin-firstname=Facundo --admin-lastname=Capua --cleanup-database --use-sample-data
     - cd app/code/MercadoPago/Core/Test
-    - curl http://magento-2-travis.dev/ > /tmp/pepe.log
-    - sudo cat /tmp/pepe.log
-    - sudo find /var/log/apache2 -exec cat '{}' \;
-    - sudo cat /var/log/apache2/errormp.log
+    #- curl http://magento-2-travis.dev/ > /tmp/pepe.log
+    #- sudo cat /tmp/pepe.log
+    #- sudo find /var/log/apache2 -exec cat '{}' \;
+    #- sudo cat /var/log/apache2/errormp.log
 
     - cp behat.yml.dist behat.yml
     - sed -e "s?%MAGENTO_URL%?http://magento-2-travis.dev/?g" --in-place behat.yml
