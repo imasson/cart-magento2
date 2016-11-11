@@ -161,7 +161,7 @@ class FeatureContext
     public function iSelectShippingMethod($method)
     {
         $page = $this->getSession()->getPage();
-        $page->fillField('shipping_method', $method);
+        $page->fillField('s_method_flatrate_flatrate', $method);
     }
 
     /**
