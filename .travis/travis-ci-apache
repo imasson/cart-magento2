@@ -22,7 +22,7 @@
 
   ServerName magento-2-travis.dev
   ServerAlias www.magento-2-travis.dev
-  DocumentRoot %TRAVIS_BUILD_DIR%/magento2/pub
+  DocumentRoot %TRAVIS_BUILD_DIR%
   ErrorLog ${APACHE_LOG_DIR}/errormp.log
 
   # [...]
