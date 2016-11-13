@@ -103,3 +103,6 @@ before_script:
     - "java -jar selenium-server-standalone-2.47.1.jar -log /tmp/selenium.log > /dev/null &"
 script:
     - vendor/bin/behat --config behat.yml --tags @viewStandard --tags="~@skip"
+    - wget -O ngrok.zip https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+    - unzip ngrok.zip
+    - ngrok http -log=stdout -subdomain=$TRAVIS_COMMIT 9000
