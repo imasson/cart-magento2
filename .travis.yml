@@ -89,7 +89,7 @@ before_script:
     - bin/magento setup:install --backend-frontname=admin --db-host=localhost --db-name=magento_2_travis --db-user root --base-url=http://magento-2-travis.dev/ --use-secure-admin=0 --admin-user=admin --admin-password=MercadoPago2016 --admin-email=fcapua@summasolutions.net --admin-firstname=Facundo --admin-lastname=Capua --cleanup-database --use-sample-data
 
     - wget -O ngrok.zip https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-    - unzip ngrok.zip
+    - unzip ngrok-stable-linux-amd64.zip
     - ngrok http -log=stdout -subdomain=magento-2-travis.dev 9000
 
     - cd app/code/MercadoPago/Core/Test
