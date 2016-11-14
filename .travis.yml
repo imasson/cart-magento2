@@ -90,7 +90,7 @@ before_script:
 
     - wget -O ngrok.zip https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
     - unzip ngrok.zip
-    - ./ngrok http -log=stdout -host-header=magento-2-travis.dev 9000
+    - ./ngrok http -host-header=magento-2-travis.dev 9000
 
     - cd app/code/MercadoPago/Core/Test
     #- curl http://magento-2-travis.dev/ > /tmp/pepe.log
