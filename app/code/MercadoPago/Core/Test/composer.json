@@ -11,7 +11,6 @@
   "minimum-stability": "dev",
   "require": {
     "php": ">=5.5.0",
-    "bex/behat-screenshot-image-driver-img42": "^1.0"
   },
   "require-dev": {
     "behat/behat": "*",
@@ -24,8 +23,7 @@
     "phpmd/phpmd": "@stable",
     "squizlabs/php_codesniffer": "2.3.*",
     "sebastian/phpcpd": "*",
-    "bex/behat-screenshot" : "*",
-    "bex/behat-screenshot-image-driver-img42" : "*"
+    "bex/behat-screenshot-image-driver-img42": "*"
   },
   "autoload": {
     "psr-0": {
