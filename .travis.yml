@@ -83,5 +83,6 @@ script:
 - vendor/bin/behat --config behat.yml --tags @viewStandard --tags="~@skip"
 - sudo cat /var/log/apache2/errormp.log
 - cd "%TRAVIS_BUILD_DIR%"
-- sudo find var/log -exec cat '{}'
+- cd var/log
+- cat *log
 
