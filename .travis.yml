@@ -71,6 +71,10 @@ before_script:
 #- wget -O ngrok.zip https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
 #- unzip ngrok.zip
 #- "./ngrok http --log=stdout --log-level=debug -host-header=magento-2-travis.dev 80"
+- bin/magento module:enable MercadoPago_Core
+- bin/magento module:enable MercadoPago_MercadoEnvios
+- bin/magento setup:static-content:deploy
+- bin/magento setup:upgrade
 - cd app/code/MercadoPago/Core/Test
 - cp behat.yml.dist behat.yml
 - sed -e "s?%MAGENTO_URL%?http://magento-2-travis.dev/?g" --in-place behat.yml
@@ -81,16 +85,10 @@ before_script:
 - wget http://selenium-release.storage.googleapis.com/2.47/selenium-server-standalone-2.47.1.jar
 - java -jar selenium-server-standalone-2.47.1.jar -log /tmp/selenium.log > /dev/null
   &
-- cd $TRAVIS_BUILD_DIR
-- sudo chmod 777 -R .
-- bin/magento setup:static-content:deploy
-- bin/magento cache:flush
-- sudo chmod 777 -R .
 script:
-- cd app/code/MercadoPago/Core/Test
 - vendor/bin/behat --config behat.yml --tags @viewStandard --tags="~@skip"
 - sudo cat /var/log/apache2/errormp.log
 - cd $TRAVIS_BUILD_DIR
 - cd var/log
-- tail 100 *log
+- tail -100 *log
 
