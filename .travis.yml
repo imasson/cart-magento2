@@ -66,9 +66,9 @@ before_script:
   --db-user root --base-url=http://magento-2-travis.dev/ --use-secure-admin=0 --admin-user=admin
   --admin-password=MercadoPago2016 --admin-email=fcapua@summasolutions.net --admin-firstname=Facundo
   --admin-lastname=Capua --cleanup-database --use-sample-data
-- wget -O ngrok.zip https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-- unzip ngrok.zip
-- "./ngrok http --log=stdout --log-level=debug -host-header=magento-2-travis.dev 80"
+#- wget -O ngrok.zip https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+#- unzip ngrok.zip
+#- "./ngrok http --log=stdout --log-level=debug -host-header=magento-2-travis.dev 80"
 - cd app/code/MercadoPago/Core/Test
 - cp behat.yml.dist behat.yml
 - sed -e "s?%MAGENTO_URL%?http://magento-2-travis.dev/?g" --in-place behat.yml
