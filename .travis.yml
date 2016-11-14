@@ -81,14 +81,7 @@ before_script:
   &
 script:
 - vendor/bin/behat --config behat.yml --tags @viewStandard --tags="~@skip"
-- sudo find /var/log/apache2 -exec cat '{}' \;
 - sudo cat /var/log/apache2/errormp.log
+- cd "%TRAVIS_BUILD_DIR%"
+- sudo find var/log -exec cat '{}'
 
-deploy:
-  provider: releases
-  api_key:
-    secure: ifyfY3fHQubZ+9FHQm5XcgFb+IspMt5tD87PFzKh99+P6X0nUcaHYoSKZ+ASMw0dESzXHEDi4i6oS1Xv8IspUPsyKCYdii41Oi/zHiGUNPnk96mey/Ucvr8tYKTYxlNQ5uA1GKGfxM3RGb7EHeD40PXQa3elSDJY5BLFvUSJquuHD+GC9ZQ1V9a3LbYHkZPiHAcg5S7cAm+h+EEqWuxeMv6KDA6Heyb5cyGkG5QEOU5QvNxvfSKSSXsQBdVBC1pXSF+xjNHKz+58b5rdFC3RWjVBIFzP8VtVI8RT1+J7l8bOHzT3BLEigTLbTHZc6WUyaDK0NWkj+rlV3ChtRTP9vckW4ew/McV1tXpkduonhO6xG9RDyVtBhareIAheHDSfDSVi8CtKSeozEHzX+zcUjftbfbrD8cQkb49qLGXQeY5JOb04EF6BT6UjpjXcghbx1bKVGSj5zmHSzX28Ml0warhd64E5VbxbBikkcqgjF+bQv/77tys/0MG8vOB1IVDA3FhW0VHMSp1q9Ag3Qxc2R56cBE1371tyTiq8LKMl1dZTvgyAj6ZzWFjsoVY2y2i8IJrm/Es8f747PGtilDXRDXTjEJE60gLzDArMYzA3LF0++//yfkmxB4UdAQBqivL0oslXBbXyc75QDEEdB+Bx0gZdNJaSkSygwr0NUcgBrto=
-  file: screenshot.png
-  on:
-    repo: imasson/cart-magento2
-    branch: develop_travis
