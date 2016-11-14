@@ -13,11 +13,11 @@ Feature: A customer should be able to do a checkout with MercadoPago
   @viewStandard
   Scenario: See MercadoPago standard option as a payment method
     And I configure mercadopago standard
-    And Setting Config "carriers/flatrate/active" is "1"
     And I press "[data-role='proceed-to-checkout']" element
     And I wait for "6" seconds
     And I fill the shipping address
     And I select shipping method "flatrate_flatrate"
+    And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "6" seconds
 
@@ -52,9 +52,11 @@ Feature: A customer should be able to do a checkout with MercadoPago
   @checkoutSuccess
   Scenario: Generate order with standard checkout
     When I press "[data-role='proceed-to-checkout']" element
+    And I configure mercadopago standard
     And I wait for "6" seconds
     And I fill the shipping address
     And I select shipping method "flatrate_flatrate"
+    And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "8" seconds
     And I select payment method "mercadopago_standard"
@@ -74,6 +76,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I fill the shipping address
     And I wait for "6" seconds
     And I select shipping method "flatrate_flatrate"
+    And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "15" seconds
     And I select payment method "mercadopago_standard"
