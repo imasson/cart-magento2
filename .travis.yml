@@ -79,6 +79,11 @@ before_script:
 - wget http://selenium-release.storage.googleapis.com/2.47/selenium-server-standalone-2.47.1.jar
 - java -jar selenium-server-standalone-2.47.1.jar -log /tmp/selenium.log > /dev/null
   &
+- cd $TRAVIS_BUILD_DIR
+- sudo chmod 777 -R .
+- bin/magento setup:static-content:deploy
+- bin/magento cache:flush
+- sudo chmod 777 -R .
 script:
 - vendor/bin/behat --config behat.yml --tags @viewStandard --tags="~@skip"
 - sudo cat /var/log/apache2/errormp.log
