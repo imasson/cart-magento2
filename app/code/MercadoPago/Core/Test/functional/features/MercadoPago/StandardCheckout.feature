@@ -13,6 +13,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
   @viewStandard
   Scenario: See MercadoPago standard option as a payment method
     And I configure mercadopago standard
+    And Setting Config "carriers/flatrate/active" is "1"
     And I press "[data-role='proceed-to-checkout']" element
     And I wait for "6" seconds
     And I fill the shipping address
