@@ -85,6 +85,7 @@ before_script:
 - bin/magento cache:flush
 - sudo chmod 777 -R .
 script:
+- cd app/code/MercadoPago/Core/Test
 - vendor/bin/behat --config behat.yml --tags @viewStandard --tags="~@skip"
 - sudo cat /var/log/apache2/errormp.log
 - cd $TRAVIS_BUILD_DIR
