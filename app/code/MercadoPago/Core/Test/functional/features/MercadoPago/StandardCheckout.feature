@@ -15,10 +15,8 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I configure mercadopago standard
     And I press "[data-role='proceed-to-checkout']" element
     And I wait for "6" seconds
-    And I test
     And I fill the shipping address
     And I wait for "6" seconds
-    And I test
     And I select shipping method "flatrate_flatrate"
     And I press "#shipping-method-buttons-container .button" element
 
