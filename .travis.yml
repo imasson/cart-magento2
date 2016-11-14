@@ -45,6 +45,8 @@ before_script:
   version-name)/etc/php-fpm.conf
 - sudo a2enmod rewrite actions fastcgi alias
 - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+- echo "always_populate_raw_post_data = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+- echo "date.timezone = America/New_York" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 - "~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm"
 - sudo chmod 777 /home /home/travis /home/travis/build
 - sudo cp -f .travis/travis-ci-apache /etc/apache2/sites-available/000-default.conf
