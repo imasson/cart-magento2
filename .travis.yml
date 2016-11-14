@@ -84,5 +84,5 @@ script:
 - sudo cat /var/log/apache2/errormp.log
 - cd $TRAVIS_BUILD_DIR
 - cd var/log
-- cat *log
+- tail 100 *log
 
