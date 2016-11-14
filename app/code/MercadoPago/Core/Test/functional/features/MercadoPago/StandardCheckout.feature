@@ -18,8 +18,8 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I wait for "6" seconds
     And I fill the shipping address
     And I select shipping method "flatrate_flatrate"
-    And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
+    And I wait for "6" seconds
 
     Then I should see MercadoPago Standard available
 
@@ -29,9 +29,9 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I press "[data-role='proceed-to-checkout']" element
     And I wait for "6" seconds
     And I fill the shipping address
-    And I wait for "6" seconds
     And I select shipping method "flatrate_flatrate"
     And I press "#shipping-method-buttons-container .button" element
+    And I wait for "6" seconds
 
     Then I should not see MercadoPago Standard available
     And i revert configs
@@ -42,9 +42,9 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I press "[data-role='proceed-to-checkout']" element
     And I wait for "6" seconds
     And I fill the shipping address
-    And I wait for "6" seconds
     And I select shipping method "flatrate_flatrate"
     And I press "#shipping-method-buttons-container .button" element
+    And I wait for "6" seconds
 
     Then I should not see MercadoPago Standard available
     And i revert configs
