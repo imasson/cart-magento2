@@ -23,7 +23,8 @@
     "phpmd/phpmd": "@stable",
     "squizlabs/php_codesniffer": "2.3.*",
     "sebastian/phpcpd": "*",
-    "bex/behat-screenshot-image-driver-img42": "*"
+    "bex/behat-screenshot" : "*",
+    "bex/behat-screenshot-image-driver-img42" : "*"
   },
   "autoload": {
     "psr-0": {
