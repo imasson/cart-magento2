@@ -2,8 +2,9 @@
 Feature: A customer should be able to do a checkout with MercadoPago
 
   Background:
-    Given User "test_user_58666377@testuser.com" "magento" exists
-    And I am logged in as "test_user_58666377@testuser.com" "magento"
+    Given User "test_user_58666377@testuser.com" "Summa2009" exists
+    And I am logged in as "test_user_58666377@testuser.com" "Summa2009"
+    And Setting Config "customer/address/street_lines" is "1"
     And I empty cart
     And I am on page "push-it-messenger-bag.html"
     And I press "#product-addtocart-button" element
