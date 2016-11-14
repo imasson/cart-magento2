@@ -17,8 +17,8 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I press "[data-role='proceed-to-checkout']" element
     And I wait for "6" seconds
     And I fill the shipping address
+    And I select shipping method "flatrate_flatrate"
     And I wait for "6" seconds
-    And I select shipping method option field "s_method_flatrate_flatrate" with "flatrate_flatrate"
     And I press "#shipping-method-buttons-container .button" element
 
     Then I should see MercadoPago Standard available
@@ -30,7 +30,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I wait for "6" seconds
     And I fill the shipping address
     And I wait for "6" seconds
-    And I select shipping method option field "s_method_flatrate_flatrate" with "flatrate_flatrate"
+    And I select shipping method "flatrate_flatrate"
     And I press "#shipping-method-buttons-container .button" element
 
     Then I should not see MercadoPago Standard available
@@ -43,7 +43,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I wait for "6" seconds
     And I fill the shipping address
     And I wait for "6" seconds
-    And I select shipping method option field "s_method_flatrate_flatrate" with "flatrate_flatrate"
+    And I select shipping method "flatrate_flatrate"
     And I press "#shipping-method-buttons-container .button" element
 
     Then I should not see MercadoPago Standard available
@@ -54,7 +54,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     When I press "[data-role='proceed-to-checkout']" element
     And I wait for "6" seconds
     And I fill the shipping address
-    And I select shipping method option field "s_method_flatrate_flatrate" with "flatrate_flatrate"
+    And I select shipping method "flatrate_flatrate"
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "8" seconds
     And I select payment method "mercadopago_standard"
@@ -73,7 +73,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     When I press "[data-role='proceed-to-checkout']" element
     And I fill the shipping address
     And I wait for "6" seconds
-    And I select shipping method option field "s_method_flatrate_flatrate" with "flatrate_flatrate"
+    And I select shipping method "flatrate_flatrate"
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "15" seconds
     And I select payment method "mercadopago_standard"
