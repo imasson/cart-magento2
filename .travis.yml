@@ -81,9 +81,9 @@ before_script:
   &
 script:
 - vendor/bin/behat --config behat.yml --tags @viewStandard --tags="~@skip"
-- wget -O ngrok.zip https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-- unzip ngrok.zip
-- ngrok http -log=stdout -subdomain=magento-2-travis.dev 9000
+- sudo find /var/log/apache2 -exec cat '{}' \;
+- sudo cat /var/log/apache2/errormp.log
+
 deploy:
   provider: releases
   api_key:
