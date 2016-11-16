@@ -39,10 +39,11 @@ class Category
     {
         $this->coreHelper->log("Get Categories... ", 'mercadopago');
 
-        $response = \MercadoPago_Core_Lib_RestClient::get("/item_categories");
+        \MercadoPago\MercadoPagoSdk::initialize();
+        $response = \MercadoPago\MercadoPagoSdk::restClient()->get('/item_categories');
         $this->coreHelper->log("API item_categories", 'mercadopago', $response);
 
-        $response = $response['response'];
+        $response = $response['body'];
 
         $cat = array();
         $count = 0;

@@ -75,6 +75,7 @@ class Data
      * @var \Magento\Sales\Model\OrderFactory
      */
     protected $_orderFactory;
+    protected $_config;
 
     /**
      * Data constructor.
@@ -190,6 +191,46 @@ class Data
 
     }
 
+    public function initApiInstance()
+    {
+        if (!$this->_config) {
+            \MercadoPago\MercadoPagoSdk::initialize();
+            $this->_config = \MercadoPago\MercadoPagoSdk::config();
+        }
+
+        $params = func_num_args();
+        if (empty($params)) {
+            return;
+        }
+
+        if ($params == 1) {
+            $this->_config->set('ACCESS_TOKEN', func_get_arg(0));
+        } else {
+            $this->_config->set('CLIENT_ID', func_get_arg(0));
+            $this->_config->set('CLIENT_SECRET', func_get_arg(1));
+        }
+    }
+
+    public function isValidAccessToken($accessToken)
+    {
+        $this->initApiInstance();
+        $response = \MercadoPago\MercadoPagoSdk::restClient()->get("/v1/payment_methods", ['url_query' => ['access_token' => $accessToken]]);
+        if ($response['code'] == 401 || $response['code'] == 400) {
+            return false;
+        }
+        $this->_config->set('ACCESS_TOKEN', $accessToken);
+
+        return true;
+    }
+
+    public function isValidClientCredentials($clientId, $clientSecret)
+    {
+        $this->initApiInstance($clientId, $clientSecret);
+        $accessToken = $this->_config->get('ACCESS_TOKEN');
+
+        return !empty($accessToken);
+    }
+
     /**
      * AccessToken valid?
      *
@@ -198,7 +239,7 @@ class Data
      * @return bool
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function isValidAccessToken($accessToken)
+    public function isValidAccessToken2($accessToken)
     {
         $mp = $this->getApiInstance($accessToken);
         $response = $mp->get("/v1/payment_methods");
@@ -218,7 +259,7 @@ class Data
      * @return bool
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function isValidClientCredentials($clientId, $clientSecret)
+    public function isValidClientCredentials2($clientId, $clientSecret)
     {
         $mp = $this->getApiInstance($clientId, $clientSecret);
         try {
