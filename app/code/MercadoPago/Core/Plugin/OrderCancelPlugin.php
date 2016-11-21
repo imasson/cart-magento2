@@ -70,18 +70,22 @@ class OrderCancelPlugin
             $clientId = $this->dataHelper->getClientId();
             $clientSecret = $this->dataHelper->getClientSecret();
 
-            $mp = $this->dataHelper->getApiInstance($clientId, $clientSecret);
+            $this->dataHelper->initApiInstance($clientId, $clientSecret);
             $response = null;
 
-            $access_token = $this->dataHelper->getAccessToken();
+            $accessToken = $this->dataHelper->getAccessToken();
+
+            $params = [
+                'json_data'  => ['status' => 'cancelled'],
+                'url_params' => ['access_token' => $accessToken],
+                'uri'        => '/collections/' . $paymentID
+            ];
 
             if ($paymentMethod == 'mercadopago_standard') {
-                $response = $mp->cancel_payment($paymentID);
+                $response = \MercadoPago\MercadoPagoSdk::restClient()->put($params);
             } else {
-                $data = [
-                    "status" => 'cancelled',
-                ];
-                $response = $mp->put("/v1/payments/$paymentID?access_token=$access_token", $data);
+                $params['uri'] = '/v1/payments/' . $paymentID;
+                $response = \MercadoPago\MercadoPagoSdk::restClient()->put($params);
             }
 
             if ($response['status'] == 200) {

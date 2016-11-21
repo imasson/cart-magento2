@@ -192,11 +192,12 @@ class ConfigObserver
             return;
         }
 
-        $mp = $this->coreHelper->getApiInstance($accessToken);
-        $user = $mp->get("/users/me");
+        $this->coreHelper->initApiInstance($accessToken);
+        //$user = $mp->get("/users/me");
+        $user = \MercadoPago\MercadoPagoSdk::restClient()->get("/users/me");
         $this->coreHelper->log("API Users response", self::LOG_NAME, $user);
 
-        if ($user['status'] == 200 && !in_array("test_user", $user['response']['tags'])) {
+        if ($user['code'] == 200 && !in_array("test_user", $user['body']['tags'])) {
 
             $sponsors = [
                 'MLA' => 186172525,
@@ -207,7 +208,7 @@ class ConfigObserver
                 'MLV' => 206960619,
                 'MPE' => 217178514,
             ];
-            $countryCode = $user['response']['site_id'];
+            $countryCode = $user['body']['site_id'];
 
             if (isset($sponsors[$countryCode])) {
                 $sponsorId = $sponsors[$countryCode];

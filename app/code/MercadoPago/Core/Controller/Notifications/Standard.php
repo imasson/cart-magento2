@@ -72,7 +72,7 @@ class Standard
 
     protected function _isValidResponse($response)
     {
-        return ($response['status'] == 200 || $response['status'] == 201);
+        return ($response['code'] == 200 || $response['code'] == 201);
     }
 
     protected function _responseLog()
@@ -88,7 +88,7 @@ class Standard
     protected function _getFormattedPaymentData($paymentId, $data = [])
     {
         $response = $this->coreModel->getPayment($paymentId);
-        $payment = $response['response']['collection'];
+        $payment = $response['body']['collection'];
 
         return $this->_formatArrayPayment($data, $payment);
     }
@@ -129,7 +129,7 @@ class Standard
                 return;
             }
 
-            $merchantOrder = $response['response'];
+            $merchantOrder = $response['body'];
             if (count($merchantOrder['payments']) == 0) {
                 $this->_responseLog();
 
@@ -248,7 +248,7 @@ class Standard
         $data = array();
         foreach ($merchantOrder['payments'] as $payment) {
             $response = $this->coreModel->getPayment($payment['id']);
-            $payment = $response['response']['collection'];
+            $payment = $response['body']['collection'];
             $data = $this->_formatArrayPayment($data, $payment);
         }
 

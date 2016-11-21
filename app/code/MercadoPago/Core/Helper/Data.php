@@ -31,17 +31,8 @@ class Data
      */
     const XML_PATH_CLIENT_SECRET = 'payment/mercadopago_standard/client_secret';
 
-    /**
-     *api platform openplatform
-     */
-    const PLATFORM_OPENPLATFORM = 'openplatform';
-    /**
-     *api platform stdplatform
-     */
-    const PLATFORM_STD = 'std';
-    /**
-     *type
-     */
+    const PLATFORM_V1_WHITELABEL = 'v1-whitelabel';
+    const PLATFORM_DESKTOP = 'Desktop';
     const TYPE = 'magento';
 
     /**
@@ -62,9 +53,9 @@ class Data
     protected $_statusFactory;
 
     /**
-     * @var \Magento\Framework\Setup\ModuleContextInterface
+     * @var \Magento\Framework\Module\ModuleListInterface
      */
-    protected $_moduleContext;
+    protected $_moduleList;
 
     /**
      * @var bool flag indicates when status was updated by notifications.
@@ -87,7 +78,7 @@ class Data
      * @param \Magento\Store\Model\App\Emulation                   $appEmulation
      * @param \Magento\Payment\Model\Config                        $paymentConfig
      * @param \Magento\Framework\App\Config\Initial                $initialConfig
-     * @param \Magento\Framework\Setup\ModuleContextInterface      $moduleContext
+     * @param \Magento\Framework\Module\ModuleListInterface        $moduleList
      * @param \MercadoPago\Core\Logger\Logger                      $logger
      * @param \Magento\Sales\Model\ResourceModel\Status\Collection $statusFactory
      */
@@ -99,7 +90,7 @@ class Data
         \Magento\Store\Model\App\Emulation $appEmulation,
         \Magento\Payment\Model\Config $paymentConfig,
         \Magento\Framework\App\Config\Initial $initialConfig,
-        \Magento\Framework\Setup\ModuleContextInterface $moduleContext,
+        \Magento\Framework\Module\ModuleListInterface $moduleList,
         \MercadoPago\Core\Logger\Logger $logger,
         \Magento\Sales\Model\ResourceModel\Status\Collection $statusFactory,
         \Magento\Sales\Model\OrderFactory $orderFactory
@@ -108,7 +99,7 @@ class Data
         parent::__construct($context, $layoutFactory, $paymentMethodFactory, $appEmulation, $paymentConfig, $initialConfig);
         $this->_messageInterface = $messageInterface;
         $this->_mpLogger = $logger;
-        $this->_moduleContext = $moduleContext;
+        $this->_moduleList = $moduleList;
         $this->_statusFactory = $statusFactory;
         $this->_orderFactory = $orderFactory;
     }
@@ -174,10 +165,10 @@ class Data
         }
         if ($params == 1) {
             $api = new \MercadoPago_Core_Lib_Api(func_get_arg(0));
-            $api->set_platform(self::PLATFORM_OPENPLATFORM);
+            //$api->set_platform(self::PLATFORM_OPENPLATFORM);
         } else {
             $api = new \MercadoPago_Core_Lib_Api(func_get_arg(0), func_get_arg(1));
-            $api->set_platform(self::PLATFORM_STD);
+           // $api->set_platform(self::PLATFORM_STD);
         }
         if ($this->scopeConfig->getValue('payment/mercadopago_standard/sandbox_mode')) {
             $api->sandbox_mode(true);
@@ -203,11 +194,14 @@ class Data
             return;
         }
 
+        $type = self::TYPE . ' ' . (string)$this->_moduleList->getOne('MercadoPago_Core')['setup_version'];
         if ($params == 1) {
             $this->_config->set('ACCESS_TOKEN', func_get_arg(0));
+            \MercadoPago\MercadoPagoSdk::addCustomHeader('x-tracking-id', 'platform:' . self::PLATFORM_V1_WHITELABEL . ',type:' . $type . ',so;');
         } else {
             $this->_config->set('CLIENT_ID', func_get_arg(0));
             $this->_config->set('CLIENT_SECRET', func_get_arg(1));
+            \MercadoPago\MercadoPagoSdk::addCustomHeader('x-tracking-id', 'platform:' . self::PLATFORM_DESKTOP . ',type:' . $type . ',so;');
         }
     }
 
@@ -232,46 +226,6 @@ class Data
     }
 
     /**
-     * AccessToken valid?
-     *
-     * @param $accessToken
-     *
-     * @return bool
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    public function isValidAccessToken2($accessToken)
-    {
-        $mp = $this->getApiInstance($accessToken);
-        $response = $mp->get("/v1/payment_methods");
-        if ($response['status'] == 401 || $response['status'] == 400) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * ClientId and Secret valid?
-     *
-     * @param $clientId
-     * @param $clientSecret
-     *
-     * @return bool
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    public function isValidClientCredentials2($clientId, $clientSecret)
-    {
-        $mp = $this->getApiInstance($clientId, $clientSecret);
-        try {
-            $mp->get_access_token();
-        } catch (\Exception $e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Return the access token proved by api
      *
      * @return mixed
@@ -282,13 +236,11 @@ class Data
     {
         $clientId = $this->scopeConfig->getValue(self::XML_PATH_CLIENT_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $clientSecret = $this->scopeConfig->getValue(self::XML_PATH_CLIENT_SECRET, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        try {
-            $accessToken = $this->getApiInstance($clientId, $clientSecret)->get_access_token();
-        } catch (\Exception $e) {
-            $accessToken = false;
+        if ($this->isValidClientCredentials($clientId, $clientSecret)) {
+            return $this->_config->get('ACCESS_TOKEN');
+        } else {
+            return false;
         }
-
-        return $accessToken;
     }
 
     /**

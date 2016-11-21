@@ -183,16 +183,20 @@ class Payment
         $client_id = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_CLIENT_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $client_secret = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_CLIENT_SECRET, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 
-        $mp = $this->_helperData->getApiInstance($client_id, $client_secret);
+        $this->_helperData->initApiInstance($client_id, $client_secret);
 
         $pref = $this->makePreference();
+
+        $preference = new \MercadoPago\Preference($pref);
+
         $this->_helperData->log("make array", 'mercadopago-standard.log', $pref);
 
-        $response = $mp->create_preference($pref);
+        $response = $preference->save();
+        //$response = $mp->create_preference($pref);
         $this->_helperData->log("create preference result", 'mercadopago-standard.log', $response);
 
-        if ($response['status'] == 200 || $response['status'] == 201) {
-            $payment = $response['response'];
+        if ($response['code'] == 200 || $response['code'] == 201) {
+            $payment = $response['body'];
             if ($this->_scopeConfig->getValue('payment/mercadopago_standard/sandbox_mode')) {
                 $init_point = $payment['sandbox_init_point'];
             } else {

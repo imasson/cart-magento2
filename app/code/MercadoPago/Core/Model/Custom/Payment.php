@@ -264,7 +264,7 @@ class Payment
         $response = $this->preparePostPayment();
 
         if ($response) {
-            $payment = $response['response'];
+            $payment = $response['body'];
             $this->_helperData->log("Payment response", self::LOG_NAME, $payment);
             //set status
             $this->getInfoInstance()->setAdditionalInformation('status', $payment['status']);
@@ -480,15 +480,15 @@ class Payment
     public function checkAndcreateCard($customer, $token, $payment)
     {
         $accessToken = $this->getConfigData('access_token');
-        $mp = $this->_helperData->getApiInstance($accessToken);
+        $this->_helperData->initApiInstance($accessToken);
 
         foreach ($customer['cards'] as $card) {
 
 
-            if ($card['first_six_digits'] == $payment['card']['first_six_digits']
-                && $card['last_four_digits'] == $payment['card']['last_four_digits']
-                && $card['expiration_month'] == $payment['card']['expiration_month']
-                && $card['expiration_year'] == $payment['card']['expiration_year']
+            if ($card->first_six_digits == $payment['card']['first_six_digits']
+                && $card->last_four_digits == $payment['card']['last_four_digits']
+                && $card->expiration_month == $payment['card']['expiration_month']
+                && $card->expiration_year == $payment['card']['expiration_year']
             ) {
                 $this->_helperData->log("Card already exists", self::LOG_NAME, $card);
 
@@ -502,12 +502,15 @@ class Payment
         if (isset($payment['payment_method_id'])) {
             $params['payment_method_id'] = $payment['payment_method_id'];
         }
-        $card = $mp->post("/v1/customers/" . $customer['id'] . "/cards", $params);
 
-        $this->_helperData->log("Response create card", self::LOG_NAME, $card);
+        $mpCard = new \MercadoPago\Card($params);
+        $mpCard->customer_id = $customer->id;
+        $response = $mpCard->save();
 
-        if ($card['status'] == 201) {
-            return $card['response'];
+        $this->_helperData->log("Response create card", self::LOG_NAME, $mpCard->toArray());
+
+        if ($response['code'] == 201) {
+            return $response['body'];
         }
 
         return false;
@@ -531,25 +534,28 @@ class Payment
             $this->_accessToken = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_ACCESS_TOKEN);
         }
 
-        $mp = $this->_helperData->getApiInstance($this->_accessToken);
+        $this->_helperData->initApiInstance($this->_accessToken);
 
-        $customer = $mp->get("/v1/customers/search", ["email" => $email]);
+        //$customer = $mp->get("/v1/customers/search", ["email" => $email]);
+        $customer = new \MercadoPago\Customer();
+        $customer->email = $email;
 
+        $response = $customer->search();
         $this->_helperData->log("Response search customer", self::LOG_NAME, $customer);
 
-        if ($customer['status'] == 200) {
+        if ($response['code'] == 200) {
 
-            if ($customer['response']['paging']['total'] > 0) {
-                return $customer['response']['results'][0];
+            if ($customer->id) {
+                return $customer->toArray();
             } else {
                 $this->_helperData->log("Customer not found: " . $email, self::LOG_NAME);
-
-                $customer = $mp->post("/v1/customers", ["email" => $email]);
+                $response = $customer->save();
+                //$customer = $mp->post("/v1/customers", ["email" => $email]);
 
                 $this->_helperData->log("Response create customer", self::LOG_NAME, $customer);
 
-                if ($customer['status'] == 201) {
-                    return $customer['response'];
+                if ($response['code'] == 201) {
+                    return $customer->toArray();
                 } else {
                     return false;
                 }

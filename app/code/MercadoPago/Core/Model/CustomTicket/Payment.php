@@ -30,7 +30,7 @@ class Payment
         $response = $this->preparePostPayment();
 
         if ($response !== false) {
-            $this->getInfoInstance()->setAdditionalInformation('activation_uri', $response['response']['transaction_details']['external_resource_url']);
+            $this->getInfoInstance()->setAdditionalInformation('activation_uri', $response->transaction_details->external_resource_url);
             $this->setOrderSubtotals($response['response']);
             return true;
         }
@@ -103,11 +103,11 @@ class Payment
         $payment_methods = $this->_coreModel->getPaymentMethods();
         $tickets = array();
 
-        //percorre todos os payments methods
-        foreach ($payment_methods['response'] as $pm) {
+        //filter ticket and atm payment methods
+        foreach ($payment_methods['body'] as $pm) {
 
-            //filtra por tickets
-            if ($pm['payment_type_id'] == "ticket") {
+            //filter ticket and atm payment methods
+            if ($pm['payment_type_id'] == "ticket" || $pm['payment_type_id'] == "atm") {
                 $tickets[] = $pm;
             }
         }

@@ -67,10 +67,11 @@ class Custom
             $response = $this->coreModel->getPaymentV1($dataId);
             $this->coreHelper->log("Return payment", self::LOG_NAME, $response);
 
-            if ($response['status'] == 200 || $response['status'] == 201) {
-                $payment = $response['response'];
+            if ($response['code'] == 200 || $response['code'] == 201) {
+                $payment = $response['body'];
 
                 $payment = $this->coreHelper->setPayerInfo($payment);
+                $this->coreHelper->setStatusUpdated($payment);
 
                 $this->coreHelper->log("Update Order", self::LOG_NAME);
                 $this->coreModel->updateOrder($payment);
