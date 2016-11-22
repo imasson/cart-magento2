@@ -303,13 +303,13 @@ class Payment
             $data = new \Magento\Framework\DataObject($data);
         }
 
-        $info_form = $data->getData('additional_data');
+        $infoForm = $data->getData('additional_data');
         //$info_form = $info_form['mercadopago_custom'];
-        if (isset($info_form['one_click_pay']) && $info_form['one_click_pay'] == 1) {
-            $info_form = $this->cleanFieldsOcp($info_form);
+        if (isset($infoForm['one_click_pay']) && $infoForm['one_click_pay'] == 1) {
+            $infoForm = $this->cleanFieldsOcp($infoForm);
         }
 
-        if (empty($info_form['token'])) {
+        if (empty($infoForm['token'])) {
             $e = "";
             $exception = new \MercadoPago\Core\Model\Api\V1\Exception(new \Magento\Framework\Phrase($e), $this->_scopeConfig);
             $e = $exception->getUserMessage();
@@ -317,15 +317,15 @@ class Payment
             throw $exception;
         }
 
-        $this->_helperData->log("info form", self::LOG_NAME, $info_form);
+        $this->_helperData->log("info form", self::LOG_NAME, $infoForm);
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation($info_form);
+        $info->setAdditionalInformation($infoForm);
         $info->setAdditionalInformation('payment_type_id', "credit_card");
-        if (!empty($info_form['card_expiration_month']) && !empty($info_form['card_expiration_year'])) {
-            $info->setAdditionalInformation('expiration_date', $info_form['card_expiration_month'] . "/" . $info_form['card_expiration_year']);
+        if (!empty($infoForm['card_expiration_month']) && !empty($infoForm['card_expiration_year'])) {
+            $info->setAdditionalInformation('expiration_date', $infoForm['card_expiration_month'] . "/" . $infoForm['card_expiration_year']);
         }
-        $info->setAdditionalInformation('payment_method', $info_form['payment_method_id']);
-        $info->setAdditionalInformation('cardholderName', $info_form['card_holder_name']);
+        $info->setAdditionalInformation('payment_method', $infoForm['payment_method_id']);
+        $info->setAdditionalInformation('cardholderName', $infoForm['card_holder_name']);
 
         return $this;
     }
