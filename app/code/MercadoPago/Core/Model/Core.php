@@ -231,7 +231,12 @@ class Core
      */
     public function _getOrder($incrementId)
     {
-        return $this->_orderFactory->create()->loadByIncrementId($incrementId);
+        $order = $this->_orderFactory->create()->loadByIncrementId($incrementId);
+        if ($order->getId()) {
+            return $order;
+        } else {
+            return $this->_orderFactory->create()->loadByAttribute('quote_id', $incrementId);
+        }
     }
 
     /**
@@ -460,7 +465,7 @@ class Core
         $preference['notification_url'] = $this->_urlBuilder->getUrl('mercadopago/notifications/custom');
         $preference['description'] = __("Order # %1 in store %2", $orderId, $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_LINK));
         $preference['transaction_amount'] = (float)$this->getAmount($quote);
-        $preference['external_reference'] = $order->getIncrementId();
+        $preference['external_reference'] = $orderId;
         $preference['payer']['email'] = $customerInfo['email'];
 
         if (!empty($payment_info['identification_type'])) {
@@ -542,19 +547,17 @@ class Core
         $this->_coreHelper->log("Access Token for Post", 'mercadopago-custom.log', $this->_accessToken);
 
         //set sdk php mercadopago
-        $this->_coreHelper->initApiInstance($this->_accessToken);
-        //$response = $mp->post("/v1/payments", $preference);
-        //$this->_coreHelper->log("POST /v1/payments", 'mercadopago-custom.log', $response);
-        $preference = new \MercadoPago\Payment($preference);
-        $response = $preference->save();
+        $mp = $this->_coreHelper->getApiInstance($this->_accessToken);
+        $response = $mp->post("/v1/payments", $preference);
+        $this->_coreHelper->log("POST /v1/payments", 'mercadopago-custom.log', $response);
 
-        if ($response['code'] == 200 || $response['code'] == 201) {
+        if ($response['status'] == 200 || $response['status'] == 201) {
             return $response;
         } else {
             $e = "";
             $exception = new \MercadoPago\Core\Model\Api\V1\Exception(new \Magento\Framework\Phrase($e), $this->_scopeConfig);
-            if (count($response['body']['cause']) > 0) {
-                foreach ($response['body']['cause'] as $error) {
+            if (count($response['response']['cause']) > 0) {
+                foreach ($response['response']['cause'] as $error) {
                     $e .= $exception->getUserMessage($error) . " ";
                 }
             } else {
@@ -572,64 +575,57 @@ class Core
     /**
      * Return info of payment returned by MP api
      *
-     * @param $paymentId
+     * @param $payment_id
      *
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getPayment($paymentId)
+    public function getPayment($payment_id)
     {
         if (!$this->_clientId || !$this->_clientSecret) {
             $this->_clientId = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_CLIENT_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $this->_clientSecret = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_CLIENT_SECRET, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         }
-        $this->_coreHelper->initApiInstance($this->_clientId, $this->_clientSecret);
-        $payment = new \MercadoPago\Payment();
-        $payment->id = $paymentId;
+        $mp = $this->_coreHelper->getApiInstance($this->_clientId, $this->_clientSecret);
 
-        //return $mp->get_payment($payment_id);
-        return $payment->read();
+        return $mp->get_payment($payment_id);
     }
 
     /**
      *  Return info of payment returned by MP api
      *
-     * @param $paymentId
+     * @param $payment_id
      *
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getPaymentV1($paymentId)
+    public function getPaymentV1($payment_id)
     {
         if (!$this->_accessToken) {
             $this->_accessToken = $this->_scopeConfig->getValue(self::XML_PATH_ACCESS_TOKEN, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         }
-        $this->_coreHelper->initApiInstance($this->_accessToken);
+        $mp = $this->_coreHelper->getApiInstance($this->_accessToken);
 
-        //return $mp->get("/v1/payments/" . $payment_id);
-        return \MercadoPago\MercadoPagoSdk::restClient()->get("/v1/payments/" . $paymentId, ['url_query' => ['access_token' => $this->_accessToken]]);
-
+        return $mp->get("/v1/payments/" . $payment_id);
     }
 
     /**
      * Return info of order returned by MP api
      *
-     * @param $merchantOrderId
+     * @param $merchant_order_id
      *
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getMerchantOrder($merchantOrderId)
+    public function getMerchantOrder($merchant_order_id)
     {
         if (!$this->_clientId || !$this->_clientSecret) {
             $this->_clientId = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_CLIENT_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $this->_clientSecret = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_CLIENT_SECRET, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         }
-        $this->_coreHelper->initApiInstance($this->_clientId, $this->_clientSecret);
-        //return $mp->get("/merchant_orders/" . $merchant_order_id);
-        $at = \MercadoPago\MercadoPagoSdk::config()->get('ACCESS_TOKEN');
+        $mp = $this->_coreHelper->getApiInstance($this->_clientId, $this->_clientSecret);
 
-        return \MercadoPago\MercadoPagoSdk::restClient()->get("/merchant_orders/" . $merchantOrderId, ['url_query' => ['access_token' => $at]]);
+        return $mp->get("/merchant_orders/" . $merchant_order_id);
     }
 
     /**
@@ -642,12 +638,11 @@ class Core
             $this->_accessToken = $this->_scopeConfig->getValue(self::XML_PATH_ACCESS_TOKEN, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         }
 
-        $this->_coreHelper->initApiInstance($this->_accessToken);
+        $mp = $this->_coreHelper->getApiInstance($this->_accessToken);
 
-        //$payment_methods = $mp->get("/v1/payment_methods");
-        $paymentMethods = new \MercadoPago\PaymentMethod();
+        $payment_methods = $mp->get("/v1/payment_methods");
 
-        return $paymentMethods->loadAll();
+        return $payment_methods;
     }
 
     /**
@@ -694,7 +689,7 @@ class Core
             $this->_accessToken = $this->_scopeConfig->getValue(self::XML_PATH_ACCESS_TOKEN, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         }
 
-        $this->_coreHelper->initApiInstance($this->_accessToken);
+        $mp = $this->_coreHelper->getApiInstance($this->_accessToken);
 
         $params = array(
             "transaction_amount" => $this->getAmount(),
@@ -702,14 +697,14 @@ class Core
             "coupon_code"        => $id
         );
 
-        //$details_discount = $mp->get("/discount_campaigns", $params);
-        $detailsDiscount = \MercadoPago\MercadoPagoSdk::restClient()->get('/discount_campaigns', ['url_query' => $params]);
+        $details_discount = $mp->get("/discount_campaigns", $params);
+
         //add value on return api discount
-        $detailsDiscount ['body']['transaction_amount'] = $params['transaction_amount'];
-        $detailsDiscount ['body']['params'] = $params;
+        $details_discount['response']['transaction_amount'] = $params['transaction_amount'];
+        $details_discount['response']['params'] = $params;
 
 
-        return $detailsDiscount;
+        return $details_discount;
     }
 
     protected function _createInvoice($order, $message)
@@ -802,52 +797,50 @@ class Core
     public function updateOrder($data, $order = null)
     {
         $this->_coreHelper->log("Update Order", 'mercadopago-notification.log');
-        if ($this->_coreHelper->isStatusUpdated()) {
-            return;
-        }
-
-        try {
-            if (!$order) {
-                $order = $this->_getOrder($data["external_reference"]);
-            }
-
-            //update payment info
-            $payment_order = $order->getPayment();
-
-            $additionalFields = array(
-                'status',
-                'status_detail',
-                'id',
-                'transaction_amount',
-                'cardholderName',
-                'installments',
-                'statement_descriptor',
-                'trunc_card'
-
-            );
-
-            foreach ($additionalFields as $field) {
-                if (isset($data[$field])) {
-                    $payment_order->setAdditionalInformation($field, $data[$field]);
+        if (true or !$this->_coreHelper->isStatusUpdated()) {
+            try {
+                if (!$order) {
+                    $order = $this->_getOrder($data["external_reference"]);
                 }
+
+                //update payment info
+                $payment_order = $order->getPayment();
+
+                $additionalFields = array(
+                    'status',
+                    'status_detail',
+                    'id',
+                    'transaction_amount',
+                    'cardholderName',
+                    'installments',
+                    'statement_descriptor',
+                    'trunc_card'
+
+                );
+
+                foreach ($additionalFields as $field) {
+                    if (isset($data[$field])) {
+                        $payment_order->setAdditionalInformation($field, $data[$field]);
+                    }
+                }
+
+                if (isset($data['payment_method_id'])) {
+                    $payment_order->setAdditionalInformation('payment_method', $data['payment_method_id']);
+                }
+
+                $payment_status = $payment_order->save();
+                $this->_coreHelper->log("Update Payment", 'mercadopago.log', $payment_status->getData());
+
+                $status_save = $order->save();
+                $this->_coreHelper->log("Update order", 'mercadopago.log', $status_save->getData());
+            } catch (\Exception $e) {
+                $this->_coreHelper->log("erro in update order status: " . $e, 'mercadopago.log');
+                $this->getResponse()->setBody($e);
+
+                //if notification proccess returns error, mercadopago will resend the notification.
+                $this->getResponse()->setHttpResponseCode(\MercadoPago\Core\Helper\Response::HTTP_BAD_REQUEST);
             }
-
-            if (isset($data['payment_method_id'])) {
-                $payment_order->setAdditionalInformation('payment_method', $data['payment_method_id']);
-            }
-
-            $payment_status = $payment_order->save();
-            $this->_coreHelper->log("Update Payment", 'mercadopago.log', $payment_status->getData());
-
-            $status_save = $order->save();
-            $this->_coreHelper->log("Update order", 'mercadopago.log', $status_save->getData());
-        } catch (\Exception $e) {
-            $this->_coreHelper->log("erro in update order status: " . $e, 'mercadopago.log');
-            $this->getResponse()->setBody($e);
-
-            //if notification proccess returns error, mercadopago will resend the notification.
-            $this->getResponse()->setHttpResponseCode(\MercadoPago\Core\Helper\Response::HTTP_BAD_REQUEST);
         }
-}
+    }
 
 }

@@ -52,7 +52,7 @@ class Method
         if ($this->_countryOptions[$country]) {
             return $this->_countryOptions[$country];
         }
-        return null;
+        return [];
     }
 
     /**

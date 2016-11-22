@@ -161,7 +161,12 @@ class FeatureContext
     public function iSelectShippingMethod($method)
     {
         $page = $this->getSession()->getPage();
-        $page->fillField('shipping_method', $method);
+        $element = $page->findById($method);
+        if (null === $element) {
+            throw new ElementNotFoundException($this->getSession()->getDriver(), 'form field', 'id', $method);
+        }
+
+        $element->press();
     }
 
     /**
@@ -326,6 +331,15 @@ class FeatureContext
     }
 
     /**
+     * @When I test
+     */
+    public function iTest()
+    {
+        $page = $this->getSession()->getPage();
+        var_dump($page->getHtml());
+    }
+
+    /**
      * @When I am logged in MP as :arg1 :arg2
      */
     public function iAmLoggedInMPAs($arg1, $arg2)
@@ -438,9 +452,9 @@ class FeatureContext
     }
 
     /**
-     * @Given I select payment method option field :arg1 with :arg2
+     * @Given I select shipping method option field :arg1 with :arg2
      */
-    public function iSelectPaymentMethodOptionFieldWith($arg1, $arg2)
+    public function iSelectShippingMethodOptionFieldWith($arg1, $arg2)
     {
         $page = $this->getSession()->getPage();
         $field = $page->find('css', $arg1);

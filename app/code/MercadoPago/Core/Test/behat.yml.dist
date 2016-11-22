@@ -1,3 +1,4 @@
+
 default:
   autoload:
     '': %paths.base%/functional/features/bootstrap
@@ -8,6 +9,8 @@ default:
   extensions:
     Cjm\Behat\StepThroughExtension: ~
     Bex\Behat\Magento2InitExtension: ~
+    Bex\Behat\ScreenshotExtension:
+              active_image_drivers: img42
     Behat\MinkExtension:
       base_url: "%MAGENTO_URL%"
       selenium2:

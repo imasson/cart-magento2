@@ -13,7 +13,7 @@
     "php": ">=5.5.0"
   },
   "require-dev": {
-    "behat/behat": "3.0.15",
+    "behat/behat": "*",
     "bex/behat-magento2-init": "*",
     "behat/mink-extension": "*",
     "behat/mink-goutte-driver": "*",
@@ -22,7 +22,9 @@
     "ciaranmcnulty/behat-stepthroughextension": "dev-master",
     "phpmd/phpmd": "@stable",
     "squizlabs/php_codesniffer": "2.3.*",
-    "sebastian/phpcpd": "*"
+    "sebastian/phpcpd": "*",
+    "bex/behat-screenshot" : "*",
+    "bex/behat-screenshot-image-driver-img42" : "*"
   },
   "autoload": {
     "psr-0": {
