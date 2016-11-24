@@ -31,7 +31,9 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I press "[data-role='proceed-to-checkout']" element
     And I wait for "6" seconds
     And I fill the shipping address
+    And I wait for "6" seconds
     And I select shipping method "s_method_flatrate"
+    And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "10" seconds
 
@@ -44,7 +46,9 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I press "[data-role='proceed-to-checkout']" element
     And I wait for "6" seconds
     And I fill the shipping address
+    And I wait for "6" seconds
     And I select shipping method "s_method_flatrate"
+    And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "10" seconds
 
@@ -57,6 +61,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I configure mercadopago standard
     And I wait for "6" seconds
     And I fill the shipping address
+    And I wait for "6" seconds
     And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
