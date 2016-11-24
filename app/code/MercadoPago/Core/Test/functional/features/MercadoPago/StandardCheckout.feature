@@ -2,10 +2,10 @@
 Feature: A customer should be able to do a checkout with MercadoPago
 
   Background:
-    Given User "test_user_58666377@testuser.com" "magento" exists
-    And I am logged in as "test_user_58666377@testuser.com" "magento"
-    And Setting Config "customer/address/street_lines" is "1"
-    #And I empty cart
+    #Given User "test_user_58666377@testuser.com" "Summa2009" exists
+    #And I am logged in as "test_user_58666377@testuser.com" "Summa2009"
+    Given Setting Config "customer/address/street_lines" is "1"
+    And I empty cart
     And I am on page "push-it-messenger-bag.html"
     And I press "#product-addtocart-button" element
     And I am on page "checkout/cart/"
@@ -21,7 +21,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
-    And I wait for "6" seconds
+    And I wait for "10" seconds
 
     Then I should see MercadoPago Standard available
 
@@ -31,9 +31,9 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I press "[data-role='proceed-to-checkout']" element
     And I wait for "6" seconds
     And I fill the shipping address
-    And I select shipping method "flatrate_flatrate"
+    And I select shipping method "s_method_flatrate"
     And I press "#shipping-method-buttons-container .button" element
-    And I wait for "6" seconds
+    And I wait for "10" seconds
 
     Then I should not see MercadoPago Standard available
     And i revert configs
@@ -44,9 +44,9 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I press "[data-role='proceed-to-checkout']" element
     And I wait for "6" seconds
     And I fill the shipping address
-    And I select shipping method "flatrate_flatrate"
+    And I select shipping method "s_method_flatrate"
     And I press "#shipping-method-buttons-container .button" element
-    And I wait for "6" seconds
+    And I wait for "10" seconds
 
     Then I should not see MercadoPago Standard available
     And i revert configs
@@ -57,10 +57,10 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I configure mercadopago standard
     And I wait for "6" seconds
     And I fill the shipping address
-    And I select shipping method "flatrate_flatrate"
+    And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
-    And I wait for "8" seconds
+    And I wait for "10" seconds
     And I select payment method "mercadopago_standard"
     And I press "#mp-standard-save-payment" element
     And I wait for "5" seconds
@@ -77,7 +77,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     When I press "[data-role='proceed-to-checkout']" element
     And I fill the shipping address
     And I wait for "6" seconds
-    And I select shipping method "flatrate_flatrate"
+    And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "15" seconds
