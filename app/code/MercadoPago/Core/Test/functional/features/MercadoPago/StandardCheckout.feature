@@ -87,7 +87,8 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "15" seconds
     And I select payment method "mercadopago_standard"
-    And I press ".primary>.button" element
+    And I press "#mp-standard-save-payment" element
+    And I wait for "5" seconds
 
     When I switch to the iframe "mercadopago_standard-iframe"
     Then I should see html "$ 50"
