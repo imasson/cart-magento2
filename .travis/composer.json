@@ -17,9 +17,14 @@
         {
             "type": "composer",
             "url": "https://repo.magento.com/"
+        },
+        {
+            "type": "vcs",
+            "url": "http://github.com/imasson/px-php"
         }
     ],
     "require": {
+        "mercadopago/px-php": "dev-feature-compatibility-bis",
         "magento/module-theme-sample-data": "100.1.*",
         "magento/module-wishlist-sample-data": "100.1.*",
         "magento/module-sales-sample-data": "100.1.*",
