@@ -2,8 +2,6 @@
 Feature: A customer should be able to do a checkout with MercadoPago
 
   Background:
-    #Given User "test_user_58666377@testuser.com" "Summa2009" exists
-    #And I am logged in as "test_user_58666377@testuser.com" "Summa2009"
     Given Setting Config "customer/address/street_lines" is "1"
     And I empty cart
     And I am on page "push-it-messenger-bag.html"
@@ -25,7 +23,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
 
     Then I should see MercadoPago Standard available
 
-  @Availability @ClientId @skip
+  @Availability @ClientId
   Scenario: Not See MercadoPago option as a payment method when is not client id
     When Setting Config "payment/mercadopago_standard/client_id" is "0"
     And I press "[data-role='proceed-to-checkout']" element
@@ -40,7 +38,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     Then I should not see MercadoPago Standard available
     And i revert configs
 
-  @Availability @ClientSecret @skip
+  @Availability @ClientSecret
   Scenario: Not See MercadoPago option as a payment method when is not available client secret
     When Setting Config "payment/mercadopago_standard/client_secret" is "0"
     And I press "[data-role='proceed-to-checkout']" element
