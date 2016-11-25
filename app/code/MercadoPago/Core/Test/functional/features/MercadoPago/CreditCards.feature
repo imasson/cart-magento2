@@ -2,8 +2,8 @@
 Feature: Payment results in MercadoPago Custom Checkout
 
   Background:
-    Given User "test_user_58666377@testuser.com" "magento" exists
-    And I am logged in as "test_user_58666377@testuser.com" "magento"
+    Given User "test_user_2135227@testuser.com" "magento" exists
+    And I am logged in as "test_user_2135227@testuser.com" "magento"
     And Setting merchant "mla"
     And I empty cart
     And I am on page "push-it-messenger-bag.html"
@@ -12,14 +12,18 @@ Feature: Payment results in MercadoPago Custom Checkout
     And I press "[data-role='proceed-to-checkout']" element
     And I wait for "6" seconds
     And I fill the shipping address
-    And I select shipping method "flatrate_flatrate"
+    And I wait for "6" seconds
+    And I select shipping method "s_method_flatrate_flatrate"
+    And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
-    And I wait for "8" seconds
+    And I wait for "20" seconds
     And I select payment method "mercadopago_custom"
+    And I wait for "5" seconds
 
   @CheckoutCustom @OUT
   Scenario Outline: See payment status
-    Given I fill text field "cardNumber" with "4509 9535 6623 3704"
+    Given I press "#use_other_card_mp" element
+    And I fill text field "cardNumber" with "4509 9535 6623 3704"
     And I select option field "cardExpirationMonth" with "01"
     And I fill text field "cardholderName" with <cardholder>
     And I fill text field "docNumber" with "12345678"

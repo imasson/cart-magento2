@@ -99,8 +99,8 @@ class Coupon
     protected function getArrayErrorResponse()
     {
         $result = [
-            "status"   => 400,
-            "response" => [
+            "code"   => 400,
+            "body" => [
                 "error"         => "invalid_id",
                 "message"       => "invalid id",
                 "coupon_amount" => 0

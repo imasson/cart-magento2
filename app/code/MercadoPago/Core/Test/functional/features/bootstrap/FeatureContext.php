@@ -196,9 +196,12 @@ class FeatureContext
             $this->findElement('.selected-item');
         } catch (ElementNotFoundException $e) {
             $page = $this->getSession()->getPage();
-            $page->fillField('customer-email', 'test_user_58666377@testuser.com');
-            $page->fillField('firstname', 'test');
-            $page->fillField('lastname', 'user');
+            $element = $page->find('css', '#customer-email');
+            if (null !== $element) {
+                $page->fillField('customer-email', 'test_user_58666377@testuser.com');
+                $page->fillField('firstname', 'test');
+                $page->fillField('lastname', 'user');
+            }
             $page->fillField('street[0]', 'Street 123');
             $page->fillField('city', 'City');
             $page->selectFieldOption('country_id', 'AR');
