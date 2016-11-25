@@ -19,7 +19,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
-    And I wait for "10" seconds
+    And I wait for "20" seconds
 
     Then I should see MercadoPago Standard available
 
@@ -33,7 +33,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
-    And I wait for "15" seconds
+    And I wait for "20" seconds
 
     Then I should not see MercadoPago Standard available
     And i revert configs
@@ -48,7 +48,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
-    And I wait for "10" seconds
+    And I wait for "20" seconds
 
     Then I should not see MercadoPago Standard available
     And i revert configs
@@ -63,7 +63,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
-    And I wait for "15" seconds
+    And I wait for "20" seconds
     And I select payment method "mercadopago_standard"
     And I press "#mp-standard-save-payment" element
     And I wait for "5" seconds
@@ -83,7 +83,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
-    And I wait for "15" seconds
+    And I wait for "20" seconds
     And I select payment method "mercadopago_standard"
     And I press "#mp-standard-save-payment" element
     And I wait for "5" seconds
