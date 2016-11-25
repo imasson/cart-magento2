@@ -23,7 +23,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
 
     Then I should see MercadoPago Standard available
 
-  @Availability @ClientId
+  @Availability @ClientId @skip
   Scenario: Not See MercadoPago option as a payment method when is not client id
     When Setting Config "payment/mercadopago_standard/client_id" is "0"
     And I press "[data-role='proceed-to-checkout']" element
@@ -38,7 +38,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     Then I should not see MercadoPago Standard available
     And i revert configs
 
-  @Availability @ClientSecret
+  @Availability @ClientSecret @skip
   Scenario: Not See MercadoPago option as a payment method when is not available client secret
     When Setting Config "payment/mercadopago_standard/client_secret" is "0"
     And I press "[data-role='proceed-to-checkout']" element
