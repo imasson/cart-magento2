@@ -13,7 +13,7 @@ Feature: Payment results in MercadoPago Custom Checkout
     And I wait for "15" seconds
     And I fill the shipping address
     And I wait for "15" seconds
-    And I select shipping method "s_method_flatrate_flatrate"
+    And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "20" seconds
