@@ -12,7 +12,7 @@ Feature: A customer should be able to do a checkout with MercadoPago applying a 
     And I press "#product-addtocart-button" element
     And I am on page "checkout/cart/"
     And I press "[data-role='proceed-to-checkout']" element
-    And I wait for "6" seconds
+    And I wait for "15" seconds
     And I fill the shipping address
     And I select shipping method "flatrate_flatrate"
     And I press "#shipping-method-buttons-container .button" element
