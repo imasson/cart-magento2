@@ -82,7 +82,7 @@ before_script:
 - java -jar selenium-server-standalone-2.47.1.jar -log /tmp/selenium.log > /dev/null
   &
 script:
-- vendor/bin/behat --config behat.yml --tags @MercadoPagoStandard --tags="~@skip"
+- vendor/bin/behat --config behat.yml --tags @MercadoPagoStandard --tags @CheckoutCustom --tags="~@skip"
 - sudo cat /var/log/apache2/errormp.log
 - cd $TRAVIS_BUILD_DIR
 - cd var/log
