@@ -160,8 +160,8 @@ class FeatureContext
      */
     public function iSelectShippingMethod($method)
     {
-        $page = $this->getSession()->getPage();
-        $element = $page->findById($method);
+        //$page = $this->getSession()->getPage();
+        $element = $this->findElement($method);
         if (null === $element) {
             throw new ElementNotFoundException($this->getSession()->getDriver(), 'form field', 'id', $method);
         }
@@ -426,6 +426,7 @@ class FeatureContext
         $clientId = $dataCountry[$arg1]['client_id'];
         $clientSecret = $dataCountry[$arg1]['client_secret'];
         $this->settingConfig('payment/mercadopago/country', $arg1);
+        $this->settingConfig('payment/mercadopago/debug_mode', 1);
         $this->settingConfig('payment/mercadopago_standard/client_id', $clientId);
         $this->settingConfig('payment/mercadopago_standard/client_secret', $clientSecret);
         if (isset($dataCountry[$arg1]['public_key'])) {
