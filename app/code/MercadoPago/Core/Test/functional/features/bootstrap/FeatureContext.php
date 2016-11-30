@@ -249,6 +249,19 @@ class FeatureContext
     }
 
     /**
+     * @Given I configure mercadopago custom
+     */
+    public function iConfigureMercadopagoCustom()
+    {
+        $configs = [
+            ['path' => 'payment/mercadopago/country', 'value' => 'mla', 'scope_type' => 'default', 'scope_code' => null],
+            ['path' => 'payment/mercadopago_custom/active', 'value' => '1', 'scope_type' => 'default', 'scope_code' => null],
+        ];
+        $this->getConfigManager()->changeConfigs($configs);
+
+    }
+
+    /**
      * @Given /^I switch to the iframe "([^"]*)"$/
      */
     public function iSwitchToIframe($arg1 = null)

@@ -2,9 +2,10 @@
 Feature: Payment results in MercadoPago Custom Checkout
 
   Background:
-    Given User "test_user_2135227@testuser.com" "magento" exists
-    And I am logged in as "test_user_2135227@testuser.com" "magento"
+    Given User "test_user_2135227@testuser.com" "Summa2009" exists
+    And I am logged in as "test_user_2135227@testuser.com" "Summa2009"
     And Setting merchant "mla"
+    And I configure mercadopago custom
     And I empty cart
     And I am on page "push-it-messenger-bag.html"
     And I press "#product-addtocart-button" element
