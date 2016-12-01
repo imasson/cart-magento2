@@ -12,7 +12,7 @@ default:
     Bex\Behat\ScreenshotExtension:
               active_image_drivers: img42
     Behat\MinkExtension:
-      base_url: "%MAGENTO_URL%"
+      base_url: "cart-magento2.local"
       selenium2:
         wd_host: http://127.0.0.1:4444/wd/hub
-        browser: %BROWSER_DRIVER%
+        browser: firefox
