@@ -23,6 +23,7 @@ addons:
       - mysql-server-5.6
       - mysql-client-core-5.6
       - mysql-client-5.6
+      - apache2
 cache:
   apt: true
   directories:
