@@ -195,18 +195,23 @@ class FeatureContext
         try {
             $this->findElement('.selected-item');
         } catch (ElementNotFoundException $e) {
-            $page = $this->getSession()->getPage();
-            $element = $page->find('css', '#customer-email');
-            if (null !== $element) {
-                $page->fillField('customer-email', 'test_user_58666377@testuser.com');
-                $page->fillField('firstname', 'test');
-                $page->fillField('lastname', 'user');
+            try {
+                $element = $this->findElement('.action-select-shipping-item');
+                $element->press();
+            } catch (ElementNotFoundException $e) {
+                $page = $this->getSession()->getPage();
+                $element = $page->find('css', '#customer-email');
+                if (null !== $element) {
+                    $page->fillField('customer-email', 'test_user_58666377@testuser.com');
+                    $page->fillField('firstname', 'test');
+                    $page->fillField('lastname', 'user');
+                }
+                $page->fillField('street[0]', 'Street 123');
+                $page->fillField('city', 'City');
+                $page->selectFieldOption('country_id', 'AR');
+                $page->fillField('postcode', '7000');
+                $page->fillField('telephone', '123456');
             }
-            $page->fillField('street[0]', 'Street 123');
-            $page->fillField('city', 'City');
-            $page->selectFieldOption('country_id', 'AR');
-            $page->fillField('postcode', '7000');
-            $page->fillField('telephone', '123456');
         }
     }
 
