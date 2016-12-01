@@ -38,7 +38,8 @@ before_script:
   mysql-client-5.5 mysql-client-core-5.5
 - sudo apt-get -y -qq autoremove;
 - sudo apt-get -y -qq autoclean;
-- sudo apt-get install -y -qq mysql-server-5.6 mysql-client-5.6;
+- sudo apt-get install -y mysql-server-5.6 mysql-client-5.6;
+- php -i | grep 'php.ini'
 - mysql -uroot -e 'SET @@global.sql_mode = NO_ENGINE_SUBSTITUTION; CREATE DATABASE
   magento_2_travis;';
 #- sudo apt-get install -y -qq apache2 libapache2-mod-fastcgi
@@ -51,7 +52,7 @@ before_script:
 - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 - echo "always_populate_raw_post_data = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 - echo "date.timezone = America/New_York" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-- "~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm"
+- ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
 - sudo chmod 777 /home /home/travis /home/travis/build
 - sudo cp -f .travis/travis-ci-apache /etc/apache2/sites-available/000-default.conf
 - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/000-default.conf
