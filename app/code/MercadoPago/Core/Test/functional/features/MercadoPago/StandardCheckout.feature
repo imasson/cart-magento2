@@ -16,7 +16,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I wait for "6" seconds
     And I fill the shipping address
     And I wait for "6" seconds
-    And I select shipping method "s_method_flatrate"
+    #And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "20" seconds
@@ -30,7 +30,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I wait for "6" seconds
     And I fill the shipping address
     And I wait for "6" seconds
-    And I select shipping method "s_method_flatrate"
+    #And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "20" seconds
@@ -45,7 +45,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I wait for "6" seconds
     And I fill the shipping address
     And I wait for "6" seconds
-    And I select shipping method "s_method_flatrate"
+    #And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "20" seconds
@@ -60,7 +60,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     And I wait for "6" seconds
     And I fill the shipping address
     And I wait for "6" seconds
-    And I select shipping method "s_method_flatrate"
+    #And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "20" seconds
@@ -80,7 +80,7 @@ Feature: A customer should be able to do a checkout with MercadoPago
     When I press "[data-role='proceed-to-checkout']" element
     And I fill the shipping address
     And I wait for "6" seconds
-    And I select shipping method "s_method_flatrate"
+    #And I select shipping method "s_method_flatrate"
     And I wait for "6" seconds
     And I press "#shipping-method-buttons-container .button" element
     And I wait for "20" seconds
