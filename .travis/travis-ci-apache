@@ -1,6 +1,6 @@
 <VirtualHost *:80>
   # [...]
-  PHPINIDir ~/.phpenv/versions/5.6/etc/php.ini
+  php_value session.save_path "~/.phpenv/versions/5.6/etc/php.ini"
   <Directory "%TRAVIS_BUILD_DIR%">
     Options FollowSymLinks MultiViews ExecCGI
     AllowOverride All
