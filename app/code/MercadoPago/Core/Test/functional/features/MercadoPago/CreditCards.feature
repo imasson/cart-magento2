@@ -11,7 +11,7 @@ Feature: Payment results in MercadoPago Custom Checkout
     And I press "#product-addtocart-button" element
     And I am on page "checkout/cart/"
     And I press "[data-role='proceed-to-checkout']" element
-    And I wait for "15" seconds
+    And I wait for "30" seconds
     And I fill the shipping address
     And I wait for "15" seconds
     And I select shipping method "#s_method_flatrate"
