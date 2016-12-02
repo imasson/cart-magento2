@@ -36,7 +36,6 @@ before_script:
   && sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty-updates
   multiverse"
 - sudo apt-get update -qq
-- jdk_switcher use openjdk8
 #- sudo apt-get remove -y -qq --purge mysql-common mysql-server-5.5 mysql-server-core-5.5
 #  mysql-client-5.5 mysql-client-core-5.5
 #- sudo apt-get -y -qq autoremove;
