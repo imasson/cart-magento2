@@ -3,7 +3,9 @@ sudo: required
 dist: trusty
 php:
 - 5.6
-group: deprecated
+before_install:
+  - source /opt/jdk_switcher/jdk_switcher.sh
+  - jdk_switcher use oraclejdk8
 env:
   global:
   - PULSESTORM_MAGE2_FAKE_URL=http://magento-2-travis.dev
