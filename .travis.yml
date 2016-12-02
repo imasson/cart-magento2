@@ -3,6 +3,7 @@ sudo: required
 dist: trusty
 php:
 - 5.6
+group: deprecated
 env:
   global:
   - PULSESTORM_MAGE2_FAKE_URL=http://magento-2-travis.dev
