@@ -33,13 +33,13 @@ before_script:
   && sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty-updates
   multiverse"
 - sudo apt-get update -qq
-- sudo apt-get remove -y -qq --purge mysql-common mysql-server-core-5.5
-  mysql-client-5.5 mysql-client-core-5.5
+- sudo apt-get remove -y -qq --purge mysql-client-5.5 mysql-client-core-5.5
+
 - sudo apt-get -y -qq autoremove;
 - sudo apt-get -y -qq autoclean;
 - sudo rm -rf /var/lib/mysql
 - sudo apt-get install -y mysql-client-5.6;
-- travis_wait sudo apt-get install -y mysql-server-5.6;
+#- sudo apt-get install -y mysql-server-5.6;
 - mysql -uroot -e 'SET @@global.sql_mode = NO_ENGINE_SUBSTITUTION; CREATE DATABASE
   magento_2_travis;';
 - sudo apt-get install -y -qq apache2 libapache2-mod-fastcgi
