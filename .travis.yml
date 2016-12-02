@@ -34,7 +34,7 @@ before_script:
   multiverse"
 - sudo apt-get update -qq
 - sudo apt-get remove -y -qq --purge mysql-common mysql-server-5.5 mysql-server-core-5.5
-  mysql-client-5.5 mysql-client-core-5.5 mysql-apt-config
+  mysql-client-5.5 mysql-client-core-5.5
 - sudo apt-get -y -qq autoremove;
 - sudo apt-get -y -qq autoclean;
 - sudo rm -rf /var/lib/mysql
