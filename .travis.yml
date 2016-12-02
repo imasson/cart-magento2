@@ -24,6 +24,8 @@ addons:
       - mysql-server-5.6
       - mysql-client-core-5.6
       - mysql-client-5.6
+jdk:
+  - oraclejdk8
 cache:
   apt: true
   directories:
@@ -43,7 +45,7 @@ before_script:
 #- sudo apt-get install -y mysql-server mysql-client;
 - mysql -uroot -e 'SET @@global.sql_mode = NO_ENGINE_SUBSTITUTION; CREATE DATABASE
   magento_2_travis;';
-- sudo apt-get install -y -qq apache2 libapache2-mod-fastcgi default-jre
+- sudo apt-get install -y -qq apache2 libapache2-mod-fastcgi
 - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf.default
   ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf 2>/dev/null ||
   true
