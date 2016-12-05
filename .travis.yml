@@ -18,7 +18,8 @@ addons:
   hosts:
   - magento-2-travis.dev
   - apache2
-before_install:
+  - google-chrome-stable
+  before_install:
   - source /opt/jdk_switcher/jdk_switcher.sh
   - jdk_switcher use oraclejdk8
 cache:
@@ -38,6 +39,7 @@ before_script:
 - sudo apt-get -y -qq autoremove;
 - sudo apt-get -y -qq autoclean;
 - sudo apt-get install -y mysql-server mysql-client;
+- sudo apt-get install -y google-chrome-stable;
 - mysql -uroot -e 'SET @@global.sql_mode = NO_ENGINE_SUBSTITUTION; CREATE DATABASE
   magento_2_travis;';
 - sudo apt-get install -y -qq apache2 libapache2-mod-fastcgi
@@ -74,7 +76,7 @@ before_script:
 - cd app/code/MercadoPago/Core/Test
 - cp behat.yml.dist behat.yml
 - sed -e "s?%MAGENTO_URL%?http://magento-2-travis.dev/?g" --in-place behat.yml
-- sed -e "s?%BROWSER_DRIVER%?firefox?g" --in-place behat.yml
+- sed -e "s?%BROWSER_DRIVER%?chrome?g" --in-place behat.yml
 - composer install --no-interaction
 - "sh -e /etc/init.d/xvfb start"
 - "export DISPLAY=:99.0"
