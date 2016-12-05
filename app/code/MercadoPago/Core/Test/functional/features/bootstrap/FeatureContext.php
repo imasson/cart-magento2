@@ -160,8 +160,8 @@ class FeatureContext
      */
     public function iSelectShippingMethod($method)
     {
-        $page = $this->getSession()->getPage();
-        $element = $page->findById($method);
+        //$page = $this->getSession()->getPage();
+        $element = $this->findElement($method);
         if (null === $element) {
             throw new ElementNotFoundException($this->getSession()->getDriver(), 'form field', 'id', $method);
         }
@@ -195,12 +195,23 @@ class FeatureContext
         try {
             $this->findElement('.selected-item');
         } catch (ElementNotFoundException $e) {
-            $page = $this->getSession()->getPage();
-            $page->fillField('street[0]', 'Street 123');
-            $page->fillField('city', 'City');
-            $page->selectFieldOption('country_id', 'AR');
-            $page->fillField('postcode', '7000');
-            $page->fillField('telephone', '123456');
+            try {
+                $element = $this->findElement('.action-select-shipping-item');
+                $element->press();
+            } catch (ElementNotFoundException $e) {
+                $page = $this->getSession()->getPage();
+                $element = $page->find('css', '#customer-email');
+                if (null !== $element) {
+                    $page->fillField('customer-email', 'test_user_58666377@testuser.com');
+                    $page->fillField('firstname', 'test');
+                    $page->fillField('lastname', 'user');
+                }
+                $page->fillField('street[0]', 'Street 123');
+                $page->fillField('city', 'City');
+                $page->selectFieldOption('country_id', 'AR');
+                $page->fillField('postcode', '7000');
+                $page->fillField('telephone', '123456');
+            }
         }
     }
 
@@ -237,6 +248,19 @@ class FeatureContext
             ['path' => 'payment/mercadopago_standard/active', 'value' => '1', 'scope_type' => 'default', 'scope_code' => null],
             ['path' => 'payment/mercadopago_standard/client_id', 'value' => '446950613712741', 'scope_type' => 'default', 'scope_code' => null],
             ['path' => 'payment/mercadopago_standard/client_secret', 'value' => '0WX05P8jtYqCtiQs6TH1d9SyOJ04nhEv', 'scope_type' => 'default', 'scope_code' => null]
+        ];
+        $this->getConfigManager()->changeConfigs($configs);
+
+    }
+
+    /**
+     * @Given I configure mercadopago custom
+     */
+    public function iConfigureMercadopagoCustom()
+    {
+        $configs = [
+            ['path' => 'payment/mercadopago/country', 'value' => 'mla', 'scope_type' => 'default', 'scope_code' => null],
+            ['path' => 'payment/mercadopago_custom/active', 'value' => '1', 'scope_type' => 'default', 'scope_code' => null],
         ];
         $this->getConfigManager()->changeConfigs($configs);
 
@@ -420,6 +444,7 @@ class FeatureContext
         $clientId = $dataCountry[$arg1]['client_id'];
         $clientSecret = $dataCountry[$arg1]['client_secret'];
         $this->settingConfig('payment/mercadopago/country', $arg1);
+        $this->settingConfig('payment/mercadopago/debug_mode', 1);
         $this->settingConfig('payment/mercadopago_standard/client_id', $clientId);
         $this->settingConfig('payment/mercadopago_standard/client_secret', $clientSecret);
         if (isset($dataCountry[$arg1]['public_key'])) {

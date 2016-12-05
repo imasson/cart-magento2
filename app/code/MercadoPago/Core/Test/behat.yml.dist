@@ -15,4 +15,4 @@ default:
       base_url: "%MAGENTO_URL%"
       selenium2:
         wd_host: http://127.0.0.1:4444/wd/hub
-        browser: %BROWSER_DRIVER%
+        browser: "%BROWSER_DRIVER%"

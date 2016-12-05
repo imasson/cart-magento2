@@ -547,24 +547,27 @@ class Core
         $this->_coreHelper->log("Access Token for Post", 'mercadopago-custom.log', $this->_accessToken);
 
         //set sdk php mercadopago
-        $mp = $this->_coreHelper->getApiInstance($this->_accessToken);
-        $response = $mp->post("/v1/payments", $preference);
+        $this->_coreHelper->initApiInstance($this->_accessToken);
+        //$response = $mp->post("/v1/payments", $preference);
+
+        $preference = new \MercadoPago\Payment($preference);
+        $response = $preference->save();
         $this->_coreHelper->log("POST /v1/payments", 'mercadopago-custom.log', $response);
 
-        if ($response['status'] == 200 || $response['status'] == 201) {
+        if ($response['code'] == 200 || $response['code'] == 201) {
             return $response;
         } else {
             $e = "";
             $exception = new \MercadoPago\Core\Model\Api\V1\Exception(new \Magento\Framework\Phrase($e), $this->_scopeConfig);
-            if (count($response['response']['cause']) > 0) {
-                foreach ($response['response']['cause'] as $error) {
+            if (count($response['body']['cause']) > 0) {
+                foreach ($response['body']['cause'] as $error) {
                     $e .= $exception->getUserMessage($error) . " ";
                 }
             } else {
                 $e = $exception->getUserMessage();
             }
 
-            $this->_coreHelper->log("erro post pago: " . $e, 'mercadopago-custom.log');
+            $this->_coreHelper->log("erro post pago: " . $e, 'mercagidopago-custom.log');
             $this->_coreHelper->log("response post pago: ", 'mercadopago-custom.log', $response);
 
             $exception->setPhrase(new \Magento\Framework\Phrase($e));
