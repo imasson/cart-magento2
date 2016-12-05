@@ -42,10 +42,10 @@ Feature: Payment results in MercadoPago Custom Checkout
     Examples:
       | cardholder | status                     | status_detail                                        |
       | APRO       | Payment Status: approved   | Payment Detail: accredited                           |
-      | CONT       | Payment Status: in_process | Payment Detail: pending_contingency                  |
-      | CALL       | Payment Status: rejected   | Payment Detail: cc_rejected_call_for_authorize       |
-      | FUND       | Payment Status: rejected   | Payment Detail: cc_rejected_insufficient_amount      |
-      | SECU       | Payment Status: rejected   | Payment Detail: cc_rejected_bad_filled_security_code |
-      | FORM       | Payment Status: rejected   | Payment Detail: cc_rejected_bad_filled_other         |
-      | OTHE       | Payment Status: rejected   | Payment Detail: cc_rejected_other_reason             |
-      | EXPI       | Payment Status: rejected   | Payment Detail: cc_rejected_bad_filled_date          |
+#      | CONT       | Payment Status: in_process | Payment Detail: pending_contingency                  |
+#      | CALL       | Payment Status: rejected   | Payment Detail: cc_rejected_call_for_authorize       |
+#      | FUND       | Payment Status: rejected   | Payment Detail: cc_rejected_insufficient_amount      |
+#      | SECU       | Payment Status: rejected   | Payment Detail: cc_rejected_bad_filled_security_code |
+#      | FORM       | Payment Status: rejected   | Payment Detail: cc_rejected_bad_filled_other         |
+#      | OTHE       | Payment Status: rejected   | Payment Detail: cc_rejected_other_reason             |
+#      | EXPI       | Payment Status: rejected   | Payment Detail: cc_rejected_bad_filled_date          |
