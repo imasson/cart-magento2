@@ -74,8 +74,8 @@ before_script:
 - composer install --no-interaction
 - "sh -e /etc/init.d/xvfb start"
 - "export DISPLAY=:99.0"
-- "wget http://selenium-release.storage.googleapis.com/2.47/selenium-server-standalone-2.47.1.jar"
-- "java -jar selenium-server-standalone-2.47.1.jar -log /tmp/selenium.log > /dev/null &"
+- "wget http://selenium-release.storage.googleapis.com/3.0/selenium-server-standalone-3.0.1.jar"
+- "java -jar selenium-server-standalone-3.0.1.jar -log /tmp/selenium.log > /dev/null &"
 - sleep 5
 script:
 - vendor/bin/behat --config behat.yml --tags @new --tags="~@skip"
