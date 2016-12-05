@@ -22,6 +22,7 @@ cache:
   - "$HOME/.cache/bin"
 before_script:
 - composer selfupdate
+- export CHROME_BIN=/usr/bin/google-chrome
 - echo '' > ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
 - sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ precise multiverse"
   && sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ precise-updates
@@ -34,6 +35,7 @@ before_script:
 - sudo apt-get -y -qq autoclean;
 - sudo apt-get install -y mysql-server-5.6 mysql-client-5.6;
 - sudo apt-get install apache2 libapache2-mod-fastcgi
+
 - mysql -uroot -e 'SET @@global.sql_mode = NO_ENGINE_SUBSTITUTION; CREATE DATABASE
   magento_2_travis;';
 - sudo apt-get install -y -qq apache2 libapache2-mod-fastcgi
@@ -69,14 +71,19 @@ before_script:
 #- "./ngrok http --log=stdout --log-level=debug -host-header=magento-2-travis.dev 80"
 - cd app/code/MercadoPago/Core/Test
 - cp behat.yml.dist behat.yml
+- sudo apt-get install -y libappindicator1 fonts-liberation
+- wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+- sudo dpkg -i google-chrome*.deb
+
 - sed -e "s?%MAGENTO_URL%?http://magento-2-travis.dev/?g" --in-place behat.yml
-- sed -e "s?%BROWSER_DRIVER%?firefox?g" --in-place behat.yml
+- sed -e "s?%BROWSER_DRIVER%?chrome?g" --in-place behat.yml
 - composer install --no-interaction
 - "sh -e /etc/init.d/xvfb start"
 - "export DISPLAY=:99.0"
-- "wget http://selenium-release.storage.googleapis.com/3.0/selenium-server-standalone-3.0.1.jar"
-- "java -jar selenium-server-standalone-3.0.1.jar -log /tmp/selenium.log > /dev/null &"
+- "wget http://selenium-release.storage.googleapis.com/2.47/selenium-server-standalone-2.47.1.jar"
+- "java -jar selenium-server-standalone-2.47.1.jar -log /tmp/selenium.log > /dev/null &"
 - sleep 5
+
 script:
 - vendor/bin/behat --config behat.yml --tags @new --tags="~@skip"
 - sudo cat /var/log/apache2/errormp.log
