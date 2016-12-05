@@ -23,8 +23,8 @@ cache:
 before_script:
 - composer selfupdate
 - echo '' > ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
-- sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty multiverse"
-  && sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty-updates
+- sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ precise multiverse"
+  && sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ precise-updates
   multiverse"
 - sudo apt-get update -qq
 - sudo apt-get remove -y -qq --purge mysql-common mysql-server-5.5 mysql-server-core-5.5
