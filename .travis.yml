@@ -26,12 +26,13 @@ before_script:
 - sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ precise multiverse"
   && sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ precise-updates
   multiverse"
+- sudo add-apt-repository 'deb http://ppa.launchpad.net/ondrej/mysql-5.6/ubuntu precise main'
 - sudo apt-get update -qq
 - sudo apt-get remove -y -qq --purge mysql-common mysql-server-5.5 mysql-server-core-5.5
   mysql-client-5.5 mysql-client-core-5.5
 - sudo apt-get -y -qq autoremove;
 - sudo apt-get -y -qq autoclean;
-- sudo apt-get install -y mysql-server mysql-client;
+- sudo apt-get install -y mysql-server-5.6 mysql-client-5.6;
 - sudo apt-get install apache2 libapache2-mod-fastcgi
 - mysql -uroot -e 'SET @@global.sql_mode = NO_ENGINE_SUBSTITUTION; CREATE DATABASE
   magento_2_travis;';
