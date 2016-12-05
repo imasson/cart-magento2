@@ -19,6 +19,10 @@ addons:
   - magento-2-travis.dev
   - apache2
   - google-chrome-stable
+  - libapache2-mod-fastcgi
+  - mysql-server-5.6
+  - mysql-client-core-5.6
+  - mysql-client-5.6
   before_install:
   - source /opt/jdk_switcher/jdk_switcher.sh
   - jdk_switcher use oraclejdk8
