@@ -16,6 +16,7 @@ env:
   - PULSESTORM_COMPOSER_REPOSITORY_TO_TEST=git@github.com:SummaSolutions/cart-magento2.git
   - PULSESTORM_COMPOSER_PACKAGE_TO_TEST=mercadopago/magento2-plugin
 addons:
+  firefox: "40.0"
   hosts:
   - magento-2-travis.dev
 cache:
