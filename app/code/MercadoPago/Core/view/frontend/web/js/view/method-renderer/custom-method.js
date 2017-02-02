@@ -104,6 +104,13 @@ define(
                     return (window.checkoutConfig.payment[this.getCode()]['discount_coupon']);
                 }
             },
+            isSecondCardEnabled: function () {
+                console.log('pepepe');
+                console.log(window.checkoutConfig.payment[this.getCode()]['second_card']);
+                if (window.checkoutConfig.payment[this.getCode()] != undefined) {
+                    return (window.checkoutConfig.payment[this.getCode()]['second_card']);
+                }
+            },
 
             getAvailableCards: function () {
                 if (window.checkoutConfig.payment[this.getCode()] != undefined) {

@@ -238,6 +238,11 @@
                             <p class="message-error error-other validation-advice"><!-- ko i18n: 'Please validate your data.'--><!-- /ko --></p>
 
                         </div>
+
+                        <!-- ko if: isSecondCardEnabled() -->
+                        <!-- ko template: 'MercadoPago_Core/payment/second_card' --><!-- /ko -->
+                        <!-- /ko -->
+
                         <div>
                             <div id="mercadopago-loading">
                                 <!--<img src="<?php echo $this->getSkinUrl('mercadopago/images/loading.gif'); ?>" alt="loading"/>-->
