@@ -245,7 +245,7 @@ define(
                     }
                 }
                 if (this.isOCPReady()) {
-                    dataObj.additional_data['customer_id'] = TinyJ('#customer_id').val();
+                    dataObj.additional_data['customer_id'] = this.getCustomerAttribute('id');
                 }
                 return dataObj;
             },
