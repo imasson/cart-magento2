@@ -107,7 +107,7 @@ var MercadoPagoCustom = (function () {
             installmentText: '#mercadopago_checkout_custom .mercadopago-text-installment',
             paymentMethod: '#paymentMethod',
             paymentMethodSelect: 'select[data-checkout="paymentMethod"]',
-            paymentMethodId: '#mercadopago_checkout_custom .payment_method_id',
+            paymentMethodId: '#mercadopago_checkout_custom #payment_method_id',
             paymenMethodNotFound: '.error-payment-method-not-found',
             mercadoPagoTextChoice: '#mercadopago_checkout_custom .mercadopago-text-choice',
             errorMethodMinAmount: '.error-payment-method-min-amount',
@@ -141,7 +141,7 @@ var MercadoPagoCustom = (function () {
             checkoutCustomSecondCard: '#mercadopago_checkout_custom_second_card',
             showSecondCard: '#show_second_card',
             hideSecondCard: '#hide_second_card',
-            secondCard: '#second_card_payment_form_mercadopago_custom',
+            secondCard: '#mercadopago_checkout_custom_second_card',
             firstCardAmount: '#first_card_amount',
             secondCardAmount: '#second_card_amount',
             firstCardAmountFields:'#first_card_amount_fields',
@@ -168,7 +168,7 @@ var MercadoPagoCustom = (function () {
             ocpSecondCard: '#second_card_mercadopago_checkout_custom_ocp',
             dataCheckoutSecondCard: '[data-checkout]',
             tokenSecondCard: '#mercadopago_checkout_custom_second_card .second_card_token',
-            paymentMethodIdSecondCard: '.second_card_payment_method_id',
+            paymentMethodIdSecondCard: '#second_card_payment_method_id',
             isSecondCardUsed: ".is_second_card_used",
             amountFirstCard: ".first_card_amount",
             amountSecondCard: ".second_card_amount",
@@ -319,6 +319,15 @@ var MercadoPagoCustom = (function () {
 
         }
 
+        function initSecondCard() {
+            actionHideSecondCard();
+            var showSecondCard = TinyJ(self.selectors.showSecondCard);
+            var hideSecondCard = TinyJ(self.selectors.hideSecondCard);
+            showSecondCard.click(actionShowSecondCard);
+            hideSecondCard.click(actionHideSecondCard);
+
+        }
+
         function setPaymentMethodId(event) {
             var paymentMethodSelector = TinyJ(self.selectors.paymentMethodSelect);
             var paymentMethodId = paymentMethodSelector.val();
@@ -367,6 +376,34 @@ var MercadoPagoCustom = (function () {
                 }
             });
             return flagReturn;
+        }
+
+        function actionHideSecondCard() {
+            TinyJ(self.selectors.secondCard).hide();
+            //TinyJ(self.selectors.firstCardAmountFields).hide();
+            TinyJ(self.selectors.showSecondCard).show();
+            isSecondCardUsed = false;
+            //TinyJ(self.selectors.isSecondCardUsed).val(false);
+            //TinyJ(self.selectors.secondCardTotalBuy).hide();
+            //TinyJ(self.selectors.firstCardTotalBuy).show();
+            cardsHandler();
+        }
+
+        function actionShowSecondCard() {
+            TinyJ(self.selectors.secondCard).show();
+            TinyJ(self.selectors.firstCardAmountFields).show();
+            TinyJ(self.selectors.showSecondCard).hide();
+            isSecondCardUsed = true;
+            TinyJ(self.selectors.isSecondCardUsed).val(true);
+            TinyJ(self.selectors.firstCardTotalBuy).hide();
+            TinyJ(self.selectors.secondCardTotalBuy).show();
+            cardsHandler();
+            cardsHandlerSecondCard();
+            if (typeof event == 'undefined'){
+                var event = {};
+            }
+            guessingPaymentMethod(event.type = self.constants.keyup);
+            initSecondCard();
         }
 
         //init one click pay
@@ -1173,6 +1210,7 @@ var MercadoPagoCustom = (function () {
             initDiscount: initDiscountMercadoPagoCustom,
             initOCP: initMercadoPagoOCP,
             initDiscountTicket: initDiscountMercadoPagoCustomTicket,
+            initSecondCard: initSecondCard,
             setPaymentService: setPaymentService,
             setPaymentMethodList: setPaymentMethodList,
             setTotalsAction: setTotalsAction,

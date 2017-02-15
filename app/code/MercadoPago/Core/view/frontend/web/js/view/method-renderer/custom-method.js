@@ -88,6 +88,12 @@ define(
                 }
             },
 
+            initSecondCard: function () {
+                if (window.checkoutConfig.payment[this.getCode()] != undefined) {
+                    MercadoPagoCustom.getInstance().initSecondCard();
+                }
+            },
+
             initDiscountApp: function () {
                 if (this.isCouponEnabled()) {
                     MercadoPagoCustom.getInstance().initDiscount();
@@ -105,7 +111,6 @@ define(
                 }
             },
             isSecondCardEnabled: function () {
-                console.log('pepepe');
                 console.log(window.checkoutConfig.payment[this.getCode()]['second_card']);
                 if (window.checkoutConfig.payment[this.getCode()] != undefined) {
                     return (window.checkoutConfig.payment[this.getCode()]['second_card']);
@@ -232,8 +237,8 @@ define(
                         'total_amount': TinyJ('#mercadopago_checkout_custom').getElem('.total_amount').val(),
                         'amount': TinyJ('#mercadopago_checkout_custom').getElem('.amount').val(),
                         'site_id': this.getCountry(),
-                        'token': TinyJ('.token').val(),
-                        'payment_method_id': TinyJ('#mercadopago_checkout_custom').getElem('.payment_method_id').val(),
+                        'token': TinyJ('#token').val(),
+                        'payment_method_id': TinyJ('#mercadopago_checkout_custom').getElem('#payment_method_id').val(),
                         'one_click_pay': TinyJ('#one_click_pay_mp').val(),
                         'issuer_id': TinyJ('#issuer').val()
                     }

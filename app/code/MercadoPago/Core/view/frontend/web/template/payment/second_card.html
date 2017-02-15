@@ -1,5 +1,8 @@
+<div>
+    <a id="show_second_card" class="action_ocp button">Use 2 Cards</a>
+</div>
 <div id="mercadopago_checkout_custom_second_card">
-
+    <a data-toggle="tooltip" title="Back to only one card" id="hide_second_card" class="action_ocp button" >X</a>
     <div class="form-list" id="payment_form_mercadopago_custom" style="">
         <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
 
@@ -222,10 +225,10 @@
                 <!--<input type="hidden" class="mercado_base_url" data-bind="attr: {value: getBaseUrl()}">-->
                 <!--<input type="hidden" class="mercado_route" data-bind="attr: {value: getRoute()}">-->
                 <input type="hidden" data-bind="attr: {name: getTokenCodeArray('second_card_token')}" value="" class="token"/>
-                <input type="hidden" data-bind="attr: {name: getTokenCodeArray('second_card_payment_method_id')}" value="" class="payment_method_id"/>
+                <input type="hidden" data-bind="attr: {name: getTokenCodeArray('second_card_payment_method_id')}" value="" class="payment_method_id" id="second_card_payment_method_id"/>
                 <input type="hidden" id="second_card_one_click_pay_mp" data-bind="attr: {name: getTokenCodeArray('second_card_one_click_pay'), value:isOCPReady()}">
             <!--</div>-->
-            <!--<div id="mercadopago-init" data-bind="template: {afterRender: initApp()}"></div>-->
+            <div id="mercadopago-init" data-bind="template: {afterRender: initSecondCard()}"></div>
         </fieldset>
     </div>
 </div>
