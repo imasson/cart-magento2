@@ -48,20 +48,20 @@
 
             <!-- /ko -->
 
-            <!--<div id="mercadopago_checkout_custom_card" class="fields field">-->
-                <!--<div id="cardNumber__mp" class="field number required">-->
-                    <!--<div><a id="return_list_card_mp" class="action_ocp">Return to cards list</a></div>-->
+            <div id="mercadopago_checkout_custom_card" class="fields field">
+                <div id="cardNumber__mp" class="field number required">
+                    <div><a id="return_list_card_mp" class="action_ocp">Return to cards list</a></div>
 
-                    <!--<label for="cardNumber" class="label">-->
-                        <!--<span>&lt;!&ndash; ko i18n: 'Card Number'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</span></label>-->
-                    <!--<div class="control">-->
-                        <!--<input type="text" id="cardNumber" data-checkout="cardNumber"-->
-                               <!--data-element-id="#cardNumber__mp" class="input-text"-->
-                               <!--data-bind="attr: {'data-validate': JSON.stringify({'required-number':true, 'validate-card-number':'#cardNumber'})}"/>-->
-                    <!--</div>-->
-                    <!--<p class="message-error error-payment-method-not-found error-E301 error-205 validation-advice">&lt;!&ndash; ko i18n: 'Card number is invalid.'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</p>-->
-                    <!--<p class="message-error error-payment-method-min-amount validation-advice">&lt;!&ndash; ko i18n: 'Cannot pay this amount with this payment_method_id.'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</p>-->
-                <!--</div>-->
+                    <label for="cardNumber" class="label">
+                        <span><!-- ko i18n: 'Card Number'--><!-- /ko --></span></label>
+                    <div class="control">
+                        <input type="text" id="cardNumber" data-checkout="cardNumber"
+                               data-element-id="#cardNumber__mp" class="input-text"
+                               data-bind="attr: {'data-validate': JSON.stringify({'required-number':true, 'validate-card-number':'#cardNumber'})}"/>
+                    </div>
+                    <p class="message-error error-payment-method-not-found error-E301 error-205 validation-advice"><!-- ko i18n: 'Card number is invalid.'--><!-- /ko --></p>
+                    <p class="message-error error-payment-method-min-amount validation-advice"><!-- ko i18n: 'Cannot pay this amount with this payment_method_id.'--><!-- /ko --></p>
+                </div>
 
                 <!--<div id="cardholderName__mp" class="field required">-->
                     <!--<label for="cardholderName" class="label">-->
@@ -187,7 +187,7 @@
                     <!--</div>-->
                     <!--<p class="message-error error-324 error-213 error-214 validation-advice">&lt;!&ndash; ko i18n: 'Document Number is invalid'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</p>-->
                 <!--</div>-->
-            <!--</div>-->
+            </div>
 
             <div id="second_card_installments__mp" class="field">
                 <label for="second_card_installments" class="label">Installments</label>
