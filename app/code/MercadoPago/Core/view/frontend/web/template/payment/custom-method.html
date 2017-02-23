@@ -46,6 +46,12 @@
                         <!-- ko template: 'MercadoPago_Core/payment/discount' --><!-- /ko -->
                         <!-- /ko -->
 
+                        <div id="first_card_amount_fields" class="show_second_card">
+                            <h3><!-- ko i18n: '1st Card'--><!-- /ko --></h3>
+                            <label for="first_card_amount"><!-- ko i18n: 'Amount'--><!-- /ko --></label>
+                            <input type="text" id="first_card_amount" class="required-entry" max="" />
+                        </div>
+
                         <!-- ko if: isOCPReady() -->
                         <div id="mercadopago_checkout_custom_ocp" class="fields">
                             <div id="cardId__mp" class="field">

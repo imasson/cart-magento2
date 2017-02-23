@@ -196,7 +196,7 @@ class ConfigObserver
         $user = $mp->get("/users/me");
         $this->coreHelper->log("API Users response", self::LOG_NAME, $user);
 
-        if ($user['status'] == 200 && !in_array("test_user", $user['response']['tags'])) {
+        if ($user['status'] == 200 && !in_array("test_user", $user['response']['tags']) && strpos($accessToken, 'TEST') === FALSE) {
 
             $sponsors = [
                 'MLA' => 186172525,
