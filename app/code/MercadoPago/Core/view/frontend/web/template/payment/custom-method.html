@@ -249,6 +249,11 @@
                         <!-- ko template: 'MercadoPago_Core/payment/second_card' --><!-- /ko -->
                         <!-- /ko -->
 
+                        <div class="total_buy">
+                            <label><!-- ko i18n: 'Total amount'--><!-- /ko --> :</label>
+                            <span class="total_buy_price" data-bind="html: getInitialGrandTotal()"> </span>
+                        </div>
+
                         <div>
                             <div id="mercadopago-loading">
                                 <!--<img src="<?php echo $this->getSkinUrl('mercadopago/images/loading.gif'); ?>" alt="loading"/>-->

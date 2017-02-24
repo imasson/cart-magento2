@@ -1,15 +1,20 @@
 <div>
     <a id="show_second_card" class="action_ocp button">Use 2 Cards</a>
 </div>
-<div id="mercadopago_checkout_custom_second_card">
+<div id="mercadopago_checkout_custom_second_card" style="display: none">
     <a data-toggle="tooltip" title="Back to only one card" id="hide_second_card" class="action_ocp button" >X</a>
     <div class="form-list" id="payment_form_mercadopago_custom" style="">
         <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
+            <li id="secondCardAmount" class="second_card_total_buy">
+                <h3><!-- ko i18n: '2nd Card'--><!-- /ko --></h3>
+                <label for="second_card_amount"><!-- ko i18n: 'Remaining Amount'--><!-- /ko --></label>
+                <input type="text" id="second_card_amount" class="required-entry" readonly/>
+            </li>
 
             <!-- ko if: isOCPReady() -->
-            <div id="mercadopago_checkout_custom_ocp_second_card" class="fields">
+            <div id="second_card_payment" class="fields">
                 <div id="second_card_cardId__mp" class="field">
-                    <div><a id="use_other_card_mp" class="action_ocp">Use other card</a></div>
+                    <div><a id="second_card_use_other_card_mp" class="action_ocp">Use other card</a></div>
                     <label for="second_card_cardId" class="label">Payment Method</label>
                     <select id="second_card_cardId" data-checkout="cardId" data-element-id="#second_card_cardId__mp" data-bind="attr: {name: getTokenCodeArray('cardId')}, options: getAvailableCards(), optionsText: 'cardName', optionsValue: 'value', optionsAfterRender: setOptionsExtraValues" >
                     </select>
@@ -46,11 +51,11 @@
                 </div>
             </div>
 
-            <div><a id="return_list_card_mp" class="action_ocp">Return to cards list</a></div>
+            <div><a id="second_card_return_list_card_mp" class="action_ocp">Return to cards list</a></div>
             <!-- /ko -->
 
             <div id="mercadopago_checkout_custom_card" class="fields field">
-                <div id="cardNumber__mp" class="field number required">
+                <div id="second_card_cardNumber__mp" class="field number required">
 
                     <label for="second_card_cardNumber" class="label">
                         <span><!-- ko i18n: 'Card Number'--><!-- /ko --></span></label>
@@ -63,130 +68,130 @@
                     <p class="message-error second_card_error-payment-method-min-amount validation-advice"><!-- ko i18n: 'Cannot pay this amount with this payment_method_id.'--><!-- /ko --></p>
                 </div>
 
-                <!--<div id="cardholderName__mp" class="field required">-->
-                    <!--<label for="cardholderName" class="label">-->
-                        <!--<span>&lt;!&ndash; ko i18n: 'Card Holder Name'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</span>-->
-                    <!--</label>-->
-                    <!--<div class="control">-->
-                        <!--<input type="text" id="cardholderName" data-checkout="cardholderName"-->
-                               <!--data-bind="attr: {name: getTokenCodeArray('card_holder_name'), 'data-validate': JSON.stringify({'required':true})}"-->
-                               <!--data-element-id="#cardholderName__mp"-->
-                        <!--/>-->
-                    <!--</div>-->
-                    <!--<p class="message-error error-316 validation-advice">&lt;!&ndash; ko i18n: 'Card Holder Name is invalid.'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</p>-->
-                <!--</div>-->
+                <div id="second_card_cardholderName__mp" class="field required">
+                    <label for="second_card_cardholderName" class="label">
+                        <span><!-- ko i18n: 'Card Holder Name'--><!-- /ko --></span>
+                    </label>
+                    <div class="control">
+                        <input type="text" id="second_card_cardholderName" data-checkout="cardholderName"
+                               data-bind="attr: {name: getTokenCodeArray('second_card_card_holder_name'), 'data-validate': JSON.stringify({'required':true})}"
+                               data-element-id="#second_card_cardholderName__mp"
+                        />
+                    </div>
+                    <p class="message-error second_card_error-316 validation-advice"><!-- ko i18n: 'Card Holder Name is invalid.'--><!-- /ko --></p>
+                </div>
 
-                <!--<div id="paymentMethod__mp" class="field">-->
-                    <!--<label for="paymentMethod" class="label">Payment Method</label>-->
-                    <!--<select id="paymentMethod" data-checkout="paymentMethod"-->
-                            <!--data-bind="attr: {name: getTokenCodeArray('paymentMethod')}"-->
-                            <!--data-element-id="#paymentMethod__mp" class="validate-select"></select>-->
-                <!--</div>-->
+                <div id="second_card_paymentMethod__mp" class="field">
+                    <label for="second_card_paymentMethod" class="label">Payment Method</label>
+                    <select id="second_card_paymentMethod" data-checkout="paymentMethod"
+                            data-bind="attr: {name: getTokenCodeArray('second_card_paymentMethod')}"
+                            data-element-id="#second_card_paymentMethod__mp" class="validate-select"></select>
+                </div>
 
-                <!--<div id="issuer__mp" class="field">-->
-                    <!--<label for="issuer" class="label">Banks</label>-->
-                    <!--<select id="issuer" data-bind="attr: {name: getTokenCodeArray('issuer_id')}" data-checkout="issuer" data-element-id="#issuer__mp"></select>-->
-                    <!--<p class="message-error error-220 validation-advice">&lt;!&ndash; ko i18n: 'Select issuer'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</p>-->
-                <!--</div>-->
+                <div id="second_card_issuer__mp" class="field">
+                    <label for="second_card_issuer" class="label">Banks</label>
+                    <select id="second_card_issuer" data-bind="attr: {name: getTokenCodeArray('second_card_issuer_id')}" data-checkout="issuer" data-element-id="#second_card_issuer__mp"></select>
+                    <p class="message-error second_card_error-220 validation-advice"><!-- ko i18n: 'Select issuer'--><!-- /ko --></p>
+                </div>
 
-                <!--<div class="field date required" id="expiration_date__mp">-->
-                    <!--<label data-bind="attr: {for: getCode() + '_expiration'}" class="label">-->
-                        <!--<span>&lt;!&ndash; ko i18n: 'Expiration Date'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</span>-->
-                    <!--</label>-->
-                    <!--<div class="control">-->
-                        <!--<div class="fields group group-2">-->
-                            <!--<div class="field no-label month">-->
-                                <!--<div class="control">-->
-                                    <!--<select name="payment[cc_exp_month]"-->
-                                            <!--class="select select-month"-->
-                                            <!--id="cardExpirationMonth"-->
-                                            <!--data-checkout="cardExpirationMonth"-->
-                                            <!--data-element-id="#expiration_date__mp"-->
-                                            <!--data-bind="attr: {'data-container': getCode() + '-cc-month', 'data-validate': JSON.stringify({required:true})},-->
-                                            <!--enable: isActive($parents),-->
-                                            <!--options: getCcMonthsValues(),-->
-                                            <!--optionsValue: 'value',-->
-                                            <!--optionsText: 'month',-->
-                                            <!--optionsCaption: $t('Month'),-->
-                                            <!--value: creditCardExpMonth">-->
-                                    <!--</select>-->
-                                <!--</div>-->
-                                <!--<p class="message-error error-325 error-208 validation-advice">&lt;!&ndash; ko i18n: 'Month is invalid.'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</p>-->
-                            <!--</div>-->
-                            <!--<div class="field no-label year">-->
-                                <!--<div class="control">-->
-                                    <!--<select name="payment[cc_exp_year]"-->
-                                            <!--class="select select-year"-->
-                                            <!--id="cardExpirationYear"-->
-                                            <!--data-checkout="cardExpirationYear"-->
-                                            <!--data-element-id="#expiration_date__mp"-->
-                                            <!--data-bind="attr: {'data-container': getCode() + '-cc-year', 'data-validate': JSON.stringify({required:true})},-->
-                                           <!--enable: isActive($parents),-->
-                                           <!--options: getCcYearsValues(),-->
-                                           <!--optionsValue: 'value',-->
-                                           <!--optionsText: 'year',-->
-                                           <!--optionsCaption: $t('Year'),-->
-                                           <!--value: creditCardExpYear">-->
-                                    <!--</select>-->
-                                <!--</div>-->
-                                <!--<p class="message-error error-326 error-209 validation-advice">&lt;!&ndash; ko i18n: 'Year is invalid.'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</p>-->
-                            <!--</div>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                <!--</div>-->
+                <div class="field date required" id="second_card_expiration_date__mp">
+                    <label data-bind="attr: {for: getCode() + 'second_card_expiration'}" class="label">
+                        <span><!-- ko i18n: 'Expiration Date'--><!-- /ko --></span>
+                    </label>
+                    <div class="control">
+                        <div class="fields group group-2">
+                            <div class="field no-label month">
+                                <div class="control">
+                                    <select name="payment[second_card_cc_exp_month]"
+                                            class="select select-month"
+                                            id="second_card_cardExpirationMonth"
+                                            data-checkout="cardExpirationMonth"
+                                            data-element-id="#second_card_expiration_date__mp"
+                                            data-bind="attr: {'data-container': getCode() + '-cc-month', 'data-validate': JSON.stringify({required:true})},
+                                            enable: isActive($parents),
+                                            options: getCcMonthsValues(),
+                                            optionsValue: 'value',
+                                            optionsText: 'month',
+                                            optionsCaption: $t('Month'),
+                                            value: creditCardExpMonth">
+                                    </select>
+                                </div>
+                                <p class="message-error second_card_error-325 second_card_error-208 validation-advice"><!-- ko i18n: 'Month is invalid.'--><!-- /ko --></p>
+                            </div>
+                            <div class="field no-label year">
+                                <div class="control">
+                                    <select name="payment[second_card_cc_exp_year]"
+                                            class="select select-year"
+                                            id="second_card_cardExpirationYear"
+                                            data-checkout="cardExpirationYear"
+                                            data-element-id="#second_card_expiration_date__mp"
+                                            data-bind="attr: {'data-container': getCode() + '-cc-year', 'data-validate': JSON.stringify({required:true})},
+                                           enable: isActive($parents),
+                                           options: getCcYearsValues(),
+                                           optionsValue: 'value',
+                                           optionsText: 'year',
+                                           optionsCaption: $t('Year'),
+                                           value: creditCardExpYear">
+                                    </select>
+                                </div>
+                                <p class="message-error second_card_error-326 second_card_error-209 validation-advice"><!-- ko i18n: 'Year is invalid.'--><!-- /ko --></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                <!--<div class="field cvv required" id="securityCode__mp">-->
-                    <!--<label data-bind="attr: {for: getCode() + '_cc_cid'}" class="label">-->
-                        <!--<span>&lt;!&ndash; ko i18n: 'Card Verification Number'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</span>-->
-                    <!--</label>-->
-                    <!--<div class="control _with-tooltip cvv-mercadopago">-->
-                        <!--<input type="number"-->
-                               <!--autocomplete="off"-->
-                               <!--class="input-text cvv"-->
-                               <!--name="payment[cc_cid]"-->
-                               <!--id="securityCode"-->
-                               <!--data-checkout="securityCode"-->
-                               <!--data-element-id="#securityCode__mp"-->
-                               <!--data-bind="attr: {title: $t('Card Verification Number'),-->
-                                                <!--'data-container': getCode() + '-cc-cvv',-->
-                                                <!--'data-validate': JSON.stringify({'required-number':true})},-->
-                                                <!--enable: isActive($parents),-->
-                                                <!--value: creditCardVerificationNumber"/>-->
-                        <!--<div class="field-tooltip toggle">-->
-                                        <!--<span class="field-tooltip-action action-cvv"-->
-                                              <!--tabindex="0"-->
-                                              <!--data-toggle="dropdown"-->
-                                              <!--data-bind="attr: {title: $t('What is this?')}, mageInit: {'dropdown':{'activeClass': '_active'}}">-->
-                                            <!--<span>&lt;!&ndash; ko i18n: 'What is this?'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</span>-->
-                                        <!--</span>-->
-                            <!--<div class="field-tooltip-content"-->
-                                 <!--data-target="dropdown"-->
-                                 <!--data-bind="html: getCvvImageHtml()">-->
-                            <!--</div>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                    <!--<p class="message-error error-E302 error-224 validation-advice">&lt;!&ndash; ko i18n: 'CVV is invalid.'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</p>-->
-                <!--</div>-->
+                <div class="field cvv required" id="second_card_securityCode__mp">
+                    <label data-bind="attr: {for: getCode() + 'second_card_cc_cid'}" class="label">
+                        <span><!-- ko i18n: 'Card Verification Number'--><!-- /ko --></span>
+                    </label>
+                    <div class="control _with-tooltip cvv-mercadopago">
+                        <input type="number"
+                               autocomplete="off"
+                               class="input-text cvv"
+                               name="payment[cc_cid]"
+                               id="second_card_securityCode"
+                               data-checkout="securityCode"
+                               data-element-id="#second_card_securityCode__mp"
+                               data-bind="attr: {title: $t('Card Verification Number'),
+                                                'data-container': getCode() + '-cc-cvv',
+                                                'data-validate': JSON.stringify({'required-number':true})},
+                                                enable: isActive($parents),
+                                                value: creditCardVerificationNumber"/>
+                        <div class="field-tooltip toggle">
+                                        <span class="field-tooltip-action action-cvv"
+                                              tabindex="0"
+                                              data-toggle="dropdown"
+                                              data-bind="attr: {title: $t('What is this?')}, mageInit: {'dropdown':{'activeClass': '_active'}}">
+                                            <span><!-- ko i18n: 'What is this?'--><!-- /ko --></span>
+                                        </span>
+                            <div class="field-tooltip-content"
+                                 data-target="dropdown"
+                                 data-bind="html: getCvvImageHtml()">
+                            </div>
+                        </div>
+                    </div>
+                    <p class="message-error second_card_error-E302 second_card_error-224 validation-advice"><!-- ko i18n: 'CVV is invalid.'--><!-- /ko --></p>
+                </div>
 
-                <!--<div id="doc_type__mp" class="field required">-->
-                    <!--<label for="docType" class="label">Document Type</label>-->
-                    <!--<select id="docType" data-checkout="docType" data-element-id="#doc_type__mp"-->
-                            <!--data-bind="attr: {name: getTokenCodeArray('doc_type')}"></select>-->
+                <div id="second_card_doc_type__mp" class="field required">
+                    <label for="second_card_docType" class="label">Document Type</label>
+                    <select id="second_card_docType" data-checkout="docType" data-element-id="#second_card_doc_type__mp"
+                            data-bind="attr: {name: getTokenCodeArray('second_card_doc_type')}"></select>
 
-                    <!--<p class="message-error error-322 error-212 validation-advice">&lt;!&ndash; ko i18n: 'Document Type is invalid.'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</p>-->
-                <!--</div>-->
+                    <p class="message-error second_card_error-322 error-212 validation-advice"><!-- ko i18n: 'Document Type is invalid.'--><!-- /ko --></p>
+                </div>
 
-                <!--<div id="doc_number__mp" class="field number required">-->
-                    <!--<label for="docNumber" class="label">-->
-                        <!--<span>&lt;!&ndash; ko i18n: 'Document Number'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</span>-->
-                    <!--</label>-->
-                    <!--<div class="control">-->
-                        <!--<input type="text" id="docNumber" class="mp-validate-docnumber" data-checkout="docNumber"-->
-                               <!--name="payment[<?php echo $_code; ?>][doc_number]" data-element-id="#doc_number__mp"-->
-                               <!--data-bind="attr: {'data-validate': JSON.stringify({'required-number':true, 'mp-validate-docnumber':'#docNumber'})}" />-->
-                    <!--</div>-->
-                    <!--<p class="message-error error-324 error-213 error-214 validation-advice">&lt;!&ndash; ko i18n: 'Document Number is invalid'&ndash;&gt;&lt;!&ndash; /ko &ndash;&gt;</p>-->
-                <!--</div>-->
+                <div id="second_card_doc_number__mp" class="field number required">
+                    <label for="second_card_docNumber" class="label">
+                        <span><!-- ko i18n: 'Document Number'--><!-- /ko --></span>
+                    </label>
+                    <div class="control">
+                        <input type="text" id="second_card_docNumber" class="mp-validate-docnumber" data-checkout="docNumber"
+                               data-element-id="#second_card_doc_number__mp"
+                               data-bind="attr: {name: getTokenCodeArray('second_card_docNumber'), 'data-validate': JSON.stringify({'required-number':true, 'mp-validate-docnumber':'#docNumber'})}" />
+                    </div>
+                    <p class="message-error second_card_error-324 second_card_error-213 second_card_error-214 validation-advice"><!-- ko i18n: 'Document Number is invalid'--><!-- /ko --></p>
+                </div>
             </div>
 
             <div id="second_card_installments__mp" class="field">
@@ -222,13 +227,18 @@
                 <!--<input type="hidden" class="mercadopago-text-choice" value="Choice">-->
                 <!--<input type="hidden" class="mercadopago-text-default-issuer" value="Default issuer">-->
                 <input type="hidden" class="second_card_mercadopago-text-installment" value="Enter the card number">
-                <!--<input type="hidden" class="mercado_base_url" data-bind="attr: {value: getBaseUrl()}">-->
+
+            <!--<input type="hidden" class="mercado_base_url" data-bind="attr: {value: getBaseUrl()}">-->
                 <!--<input type="hidden" class="mercado_route" data-bind="attr: {value: getRoute()}">-->
+                <input type="hidden" data-bind="attr: {name: getTokenCodeArray('is_second_card_used')}" value="false" class="is_second_card_used"/>
                 <input type="hidden" data-bind="attr: {name: getTokenCodeArray('second_card_token')}" value="" class="token"/>
-                <input type="hidden" data-bind="attr: {name: getTokenCodeArray('second_card_payment_method_id')}" value="" class="payment_method_id" id="second_card_payment_method_id"/>
+                <input type="hidden" data-bind="attr: {name: getTokenCodeArray('first_card_amount')}" value="" class="first_card_amount"/>
+                <input type="hidden" data-bind="attr: {name: getTokenCodeArray('second_card_amount')}" value="" class="second_card_amount"/>
+                <input type="hidden" data-bind="attr: {name: getTokenCodeArray('second_card_payment_method_id')}" value="" class="second_card_payment_method_id" id="second_card_payment_method_id"/>
                 <input type="hidden" id="second_card_one_click_pay_mp" data-bind="attr: {name: getTokenCodeArray('second_card_one_click_pay'), value:isOCPReady()}">
             <!--</div>-->
             <div id="mercadopago-init" data-bind="template: {afterRender: initSecondCard()}"></div>
         </fieldset>
     </div>
 </div>
+
