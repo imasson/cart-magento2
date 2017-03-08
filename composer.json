@@ -39,11 +39,11 @@
   "autoload": {
     "psr-4": {
       "MercadoPago\\Core\\": "app/code/MercadoPago/Core",
-      "MercadoPago\\MercadoEncios\\": "app/code/MercadoPago/MercadoEnvios"
+      "MercadoPago\\MercadoEnvios\\": "app/code/MercadoPago/MercadoEnvios"
     },
     "files": [
-      "app/MercadoPago/Core/registration.php",
-      "app/MercadoPago/MercadoEnvios/registration.php"
+      "app/code/MercadoPago/Core/registration.php",
+      "app/code/MercadoPago/MercadoEnvios/registration.php"
     ]
   }
 }
