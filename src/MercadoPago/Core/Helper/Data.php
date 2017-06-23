@@ -210,33 +210,23 @@ class Data
      */
     public function getApiInstance()
     {
+        if (!$this->_config) {
+            \MercadoPago\Sdk::initialize();
+            $this->_config = \MercadoPago\Sdk::config();
+        }
         $params = func_num_args();
-        if ($params > 2 || $params < 1) {
-            throw new \Magento\Framework\Exception\LocalizedException(__('Invalid arguments. Use CLIENT_ID and CLIENT SECRET, or ACCESS_TOKEN'));
+        if (empty($params)) {
+            return;
         }
+        $type = self::TYPE . ' ' . (string)$this->_moduleList->getOne('MercadoPago_Core')['setup_version'];
         if ($params == 1) {
-            $api = new \MercadoPago\Core\Lib\Api(func_get_arg(0));
-            $api->set_platform(self::PLATFORM_OPENPLATFORM);
+            $this->_config->set('ACCESS_TOKEN', func_get_arg(0));
+            \MercadoPago\Sdk::addCustomHeader('x-tracking-id', 'platform:' . self::PLATFORM_V1_WHITELABEL . ',type:' . $type . ',so;');
         } else {
-            $api = new \MercadoPago\Core\Lib\Api(func_get_arg(0), func_get_arg(1));
-            $api->set_platform(self::PLATFORM_STD);
+            $this->_config->set('CLIENT_ID', func_get_arg(0));
+            $this->_config->set('CLIENT_SECRET', func_get_arg(1));
+            \MercadoPago\Sdk::addCustomHeader('x-tracking-id', 'platform:' . self::PLATFORM_DESKTOP . ',type:' . $type . ',so;');
         }
-        if ($this->_switcher->getWebsiteId() != 0) {
-            if ($this->scopeConfig->getValue('payment/mercadopago_standard/sandbox_mode', \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE, $this->_switcher->getWebsiteId())) {
-                $api->sandbox_mode(true);
-            }
-        } else {
-            if ($this->scopeConfig->getValue('payment/mercadopago_standard/sandbox_mode')) {
-                $api->sandbox_mode(true);
-            }
-        }
-
-
-        $api->set_type(self::TYPE);
-
-        //$api->set_so((string)$this->_moduleContext->getVersion()); //TODO tracking
-
-        return $api;
 
     }
 
