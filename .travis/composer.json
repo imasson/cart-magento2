@@ -17,6 +17,10 @@
     {
       "type": "composer",
       "url": "https://repo.magento.com/"
+    },
+    {
+      "type": "vcs",
+      "url": "http://github.com/mercadopago/px-php"
     }
   ],
   "require": {
