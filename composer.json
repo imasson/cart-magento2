@@ -25,7 +25,7 @@
   ],
   "require": {
     "magento/magento-composer-installer": "*",
-    "mercadopago/px-php": "*"
+    "mercadopago/px-php": "dev-develop"
   },
   "require-dev": {
     "magento/product-community-edition": "2.*",
