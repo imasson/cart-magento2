@@ -84,7 +84,7 @@
       "Magento\\": "app/code/Magento/"
     }
   },
-  "minimum-stability": "alpha",
+  "minimum-stability": "dev",
   "prefer-stable": true,
   "extra": {
     "magento-force": "override"
