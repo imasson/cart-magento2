@@ -230,11 +230,13 @@ class ConfigObserver
             return;
         }
 
-        $mp = $this->coreHelper->getApiInstance($accessToken);
-        $user = $mp->get("/users/me");
+        $this->coreHelper->getApiInstance($accessToken);
+        //$user = $mp->get("/users/me");
+        $user = \MercadoPago\Sdk::get("/users/me");
+
         $this->coreHelper->log("API Users response", self::LOG_NAME, $user);
 
-        if ($user['status'] == 200 && !in_array("test_user", $user['response']['tags'])) {
+        if ($user['code'] == 200 && !in_array("test_user", $user['body']['tags'])) {
 
             $sponsors = [
                 'MLA' => 222568987,
@@ -246,7 +248,7 @@ class ConfigObserver
                 'MPE' => 222568315,
                 'MLU' => 247030424,
             ];
-            $countryCode = $user['response']['site_id'];
+            $countryCode = $user['body']['site_id'];
 
             if (isset($sponsors[$countryCode])) {
                 $sponsorId = $sponsors[$countryCode];
@@ -358,19 +360,19 @@ class ConfigObserver
                 \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE,
                 $this->_scopeCode
             );
-
-            $this->sendAnalyticsData($this->coreHelper->getApiInstance($clientId, $clientSecret));
+            $this->coreHelper->getApiInstance($clientId, $clientSecret);
+            $this->sendAnalyticsData();
 
         } else {
-
-            $this->sendAnalyticsData($this->coreHelper->getApiInstance($accessToken));
+            $this->coreHelper->getApiInstance($accessToken);
+            $this->sendAnalyticsData();
 
         }
 
 
     }
 
-    protected function sendAnalyticsData($api)
+    protected function sendAnalyticsData()
     {
         $request = [
             "data"    => [
@@ -412,7 +414,8 @@ class ConfigObserver
         $request['data']['checkout_custom_ticket_coupon'] = $customTicketCoupon == 1 ? 'true' : 'false';
 
         $this->coreHelper->log("Analytics settings request sent /modules/tracking/settings", self::LOG_NAME, $request);
-        $response = $api->post("/modules/tracking/settings", $request['data']);
+
+        $response = \MercadoPago\Sdk::post("/modules/tracking/settings", $request['data']);
         $this->coreHelper->log("Analytics settings response", self::LOG_NAME, $response);
 
     }

@@ -232,7 +232,17 @@ class RefundObserverBeforeSave
     {
         $response = null;
         $amount = $creditMemo->getGrandTotal();
+        if (!isset($order->getPayment()->getData('additional_information')['payment_method_id'])){
+            $this->throwRefundException();
+        }
 
+        $paymentID = $order->getPayment()->getData('additional_information')['payment_method_id'];
+        $accessToken = $this->_scopeConfig->getValue(self::XML_PATH_ACCESS_TOKEN, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $params = [
+            'json_data'  => ['status' => 'refund'],
+            'url_params' => ['access_token' => $accessToken],
+            'uri'        => '/collections/' . $paymentID
+        ];
         if ($paymentMethod == 'mercadopago_standard') {
             $paymentID = $order->getPayment()->getData('additional_information')['id'];
 
@@ -248,9 +258,11 @@ class RefundObserverBeforeSave
                 $this->_scopeCode
             );
 
-            $mp = $this->_dataHelper->getApiInstance($clientId, $clientSecret);
+            $this->_dataHelper->getApiInstance($clientId, $clientSecret);
             if ($isTotalRefund) {
-                $response = $mp->refund_payment($paymentID);
+                //response = $mp->refund_payment($paymentID);
+                $response = \MercadoPago\Sdk::put($params);
+
                 $order->setMercadoPagoRefundType('total');
             } else {
                 $order->setMercadoPagoRefundType('partial');
@@ -258,32 +270,35 @@ class RefundObserverBeforeSave
                     "reason"             => '',
                     "external_reference" => $order->getIncrementId(),
                 ];
-                $params = [
+                $params['json_data'] = [
                     "amount"   => $amount,
                     "metadata" => $metadata,
                 ];
-                $response = $mp->post('/collections/' . $paymentID . '/refunds?access_token=' . $mp->get_access_token(), $params);
+                $params['uri'] = "/collections/$paymentID/refunds";
+                //$response = $mp->post('/collections/' . $paymentID . '/refunds?access_token=' . $mp->get_access_token(), $params);
+                $response = \MercadoPago\Sdk::post($params);
             }
         } else {
-            $paymentID = $order->getPayment()->getData('additional_information')['payment_method_id'];
-            $accessToken = $this->_scopeConfig->getValue(self::XML_PATH_ACCESS_TOKEN, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-            $mp = $this->_dataHelper->getApiInstance($accessToken);
+            $this->_dataHelper->getApiInstance($accessToken);
+            $params['uri'] = "/v1/payments/$paymentID/refunds";
             if ($isTotalRefund) {
-                $response = $mp->post("/v1/payments/$paymentID/refunds?access_token=$accessToken", null);
+                //$response = $mp->post("/v1/payments/$paymentID/refunds?access_token=$accessToken", null);
+                $response = \MercadoPago\Sdk::post($params);
             } else {
-                $params = [
+                $params['json_data'] = [
                     "amount" => $amount,
                 ];
-                $response = $mp->post("/v1/payments/$paymentID/refunds?access_token=$accessToken", $params);
+                //$response = $mp->post("/v1/payments/$paymentID/refunds?access_token=$accessToken", $params);
+                $response = \MercadoPago\Sdk::post($params);
             }
         }
 
-        if ($response['status'] == 201 || $response['status'] == 200) {
+        if ($response['code'] == 201 || $response['code'] == 200) {
             $order->setMercadoPagoRefund(true);
             $this->_messageManager->addSuccessMessage(__('Refund made by Mercado Pago'));
         } else {
             $this->_messageManager->addErrorMessage(__('Failed to make the refund by Mercado Pago'));
-            $this->_messageManager->addErrorMessage($response['status'] . ' ' . $response['response']['message']);
+            $this->_messageManager->addErrorMessage($response['code'] . ' ' . $response['body']['message']);
             $this->throwRefundException();
         }
     }

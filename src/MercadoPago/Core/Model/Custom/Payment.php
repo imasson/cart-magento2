@@ -4,6 +4,7 @@ namespace MercadoPago\Core\Model\Custom;
 use Magento\Framework\DataObject;
 use Magento\Payment\Model\Method\Online\GatewayInterface;
 use Magento\Payment\Model\Method\ConfigInterface;
+use MercadoPago\SDK;
 
 /**
  * Class Payment
@@ -287,14 +288,14 @@ class Payment
             $responseFirstCard = $this->preparePostPayment($usingSecondCardInfo['first_card']);
             $this->_helperData->log("First payment response", self::LOG_NAME, $responseFirstCard);
 
-            if (isset($responseFirstCard) && ($responseFirstCard['response']['status'] == 'approved')) {
-                $paymentFirstCard = $responseFirstCard['response'];
+            if (isset($responseFirstCard) && ($responseFirstCard['body']['status'] == 'approved')) {
+                $paymentFirstCard = $responseFirstCard['body'];
 
                 $responseSecondCard = $this->preparePostPayment($usingSecondCardInfo['second_card']);
                 $this->_helperData->log("Second payment response", self::LOG_NAME, $responseSecondCard);
 
-                if (isset($responseSecondCard) && ($responseSecondCard['response']['status'] == 'approved')) {
-                    $paymentSecondCard = $responseSecondCard['response'];
+                if (isset($responseSecondCard) && ($responseSecondCard['body']['status'] == 'approved')) {
+                    $paymentSecondCard = $responseSecondCard['body'];
                     $additionalInfo = [
                         'status'                       => $paymentFirstCard['status'] . ' | ' . $paymentSecondCard['status'],
                         'payment_id_detail'            => $paymentFirstCard['id'] . ' | ' . $paymentSecondCard['id'],
@@ -318,9 +319,12 @@ class Payment
                 } else {
                     //second card payment failed, refund for first card
                     $accessToken = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_ACCESS_TOKEN, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-                    $mp = $this->_helperData->getApiInstance($accessToken);
+                    $this->_helperData->getApiInstance($accessToken);
                     $id = $paymentFirstCard['id'];
-                    $refundResponse = $mp->post("/v1/payments/$id/refunds?access_token=$accessToken", null);
+                    //$refundResponse = $mp->post("/v1/payments/$id/refunds?access_token=$accessToken", null);
+                    $refund = new \MercadoPago\Refund();
+                    $refund->id = $id;
+                    $refundResponse = $refund->save();
                     $this->_helperData->log("Second payment refund response", self::LOG_NAME, $refundResponse);
 
                     return false;
@@ -335,7 +339,7 @@ class Payment
             $response = $this->preparePostPayment();
 
             if ($response) {
-                $payment = $response['response'];
+                $payment = $response['body'];
                 //set status
                 $infoInstance->setAdditionalInformation('status', $payment['status']);
                 $infoInstance->setAdditionalInformation('payment_id_detail', $payment['id']);
@@ -348,25 +352,6 @@ class Payment
 
         return false;
 
-
-//        if ($this->getInfoInstance()->getAdditionalInformation('token') == "") {
-//            throw new \Exception(__('Verify the form data or wait until the validation of the payment data'));
-//        }
-//
-//        $response = $this->preparePostPayment();
-//
-//        if ($response) {
-//            $payment = $response['response'];
-//            $this->_helperData->log("Payment response", self::LOG_NAME, $payment);
-//            //set status
-//            $this->getInfoInstance()->setAdditionalInformation('status', $payment['status']);
-//            $this->getInfoInstance()->setAdditionalInformation('status_detail', $payment['status_detail']);
-//            $this->getInfoInstance()->setAdditionalInformation('payment_id_detail', $payment['id']);
-//
-//            return true;
-//        }
-//
-//        return false;
     }
 
     /**
@@ -581,7 +566,7 @@ class Payment
     public function checkAndcreateCard($customer, $token, $payment)
     {
         $accessToken = $this->getConfigData('access_token');
-        $mp = $this->_helperData->getApiInstance($accessToken);
+        $this->_helperData->getApiInstance($accessToken);
 
         foreach ($customer['cards'] as $card) {
 
@@ -603,12 +588,15 @@ class Payment
         if (isset($payment['payment_method_id'])) {
             $params['payment_method_id'] = $payment['payment_method_id'];
         }
-        $card = $mp->post("/v1/customers/" . $customer['id'] . "/cards", $params);
+        //$card = $mp->post("/v1/customers/" . $customer['id'] . "/cards", $params);
+        $mpCard = new \MercadoPago\Card($params);
+        $mpCard->customer_id = $customer->id;
+        $response = $mpCard->save();
 
-        $this->_helperData->log("Response create card", self::LOG_NAME, $card);
+        $this->_helperData->log("Response create card", self::LOG_NAME, $response);
 
-        if ($card['status'] == 201) {
-            return $card['response'];
+        if ($response['status'] == 201) {
+            return $response['body'];
         }
 
         return false;
@@ -632,25 +620,28 @@ class Payment
             $this->_accessToken = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_ACCESS_TOKEN, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         }
 
-        $mp = $this->_helperData->getApiInstance($this->_accessToken);
+        $this->_helperData->getApiInstance($this->_accessToken);
 
-        $customer = $mp->get("/v1/customers/search", ["email" => $email]);
+        //$customer = $mp->get("/v1/customers/search", ["email" => $email]);
+        $customer = new \MercadoPago\Customer();
+        $customer->email = $email;
 
+        $response = $customer->search();
         $this->_helperData->log("Response search customer", self::LOG_NAME, $customer);
 
-        if ($customer['status'] == 200) {
+        if ($response['code'] == 200) {
 
-            if ($customer['response']['paging']['total'] > 0) {
-                return $customer['response']['results'][0];
+            if ($customer->id) {
+                return $customer->toArray();
             } else {
                 $this->_helperData->log("Customer not found: " . $email, self::LOG_NAME);
+                $response = $customer->save();
+                //$customer = $mp->post("/v1/customers", ["email" => $email]);
 
-                $customer = $mp->post("/v1/customers", ["email" => $email]);
+                $this->_helperData->log("Response create customer", self::LOG_NAME, $response);
 
-                $this->_helperData->log("Response create customer", self::LOG_NAME, $customer);
-
-                if ($customer['status'] == 201) {
-                    return $customer['response'];
+                if ($response['code'] == 201) {
+                    return $customer->toArray();
                 } else {
                     return false;
                 }

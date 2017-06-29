@@ -73,8 +73,8 @@ class Custom
             $response = $this->coreModel->getPaymentV1($dataId);
             $this->coreHelper->log("Return payment", self::LOG_NAME, $response);
 
-            if ($response['status'] == 200 || $response['status'] == 201) {
-                $payment = $response['response'];
+            if ($response['code'] == 200 || $response['code'] == 201) {
+                $payment = $response['body'];
                 $payment = $this->coreHelper->setPayerInfo($payment);
 
                 $this->_order = $this->coreModel->_getOrder($payment['external_reference']);
@@ -85,7 +85,7 @@ class Custom
                 $this->coreHelper->log("Update Order", self::LOG_NAME);
                 $this->_statusHelper->setStatusUpdated($payment, $this->_order);
 
-                $data = $this->_statusHelper->formatArrayPayment($data = [], $payment, self::LOG_FILE);
+                $data = $this->_statusHelper->formatArrayPayment($data = [], $payment, self::LOG_NAME);
 
                 $this->_statusHelper->updateOrder($data, $this->_order);
                 $setStatusResponse = $this->_statusHelper->setStatusOrder($payment);

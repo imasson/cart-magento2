@@ -80,23 +80,29 @@ class OrderCancelPlugin
                 $response = null;
 
                 $accessToken = $this->_scopeConfig->getValue(\MercadoPago\Core\Model\Core::XML_PATH_ACCESS_TOKEN, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+                $params = [
+                    'json_data'  => ['status' => 'cancelled'],
+                    'url_params' => ['access_token' => $accessToken],
+                    'uri'        => '/collections/' . $paymentID
+                ];
 
                 if ($paymentMethod == 'mercadopago_standard') {
-                    $mp = $this->dataHelper->getApiInstance($clientId, $clientSecret);
-                    $response = $mp->cancel_payment($paymentID);
+                    $this->dataHelper->getApiInstance($clientId, $clientSecret);
+                    //$response = $mp->cancel_payment($paymentID);
+                    $response = \MercadoPago\Sdk::put($params);
                 } else {
-                    $mp = $this->dataHelper->getApiInstance($accessToken);
+                    $this->dataHelper->getApiInstance($accessToken);
                     $data = [
                         "status" => 'cancelled'
                     ];
-                    $response = $mp->put("/v1/payments/$paymentID?access_token=$accessToken", $data);
+                    $response = \MercadoPago\Sdk::put("/v1/payments/$paymentID?access_token=$accessToken", $data);
                 }
 
-                if ($response['status'] == 200) {
+                if ($response['code'] == 200) {
                     $this->messageManager->addSuccessMessage(__('Cancellation made by Mercado Pago'));
                 } else {
                     $this->messageManager->addErrorMessage(__('Failed to make the cancellation by Mercado Pago'));
-                    $this->messageManager->addErrorMessage($response['status'] . ' ' . $response['response']['message']);
+                    $this->messageManager->addErrorMessage($response['code'] . ' ' . $response['body']['message']);
                     $this->throwCancelationException();
                 }
             }

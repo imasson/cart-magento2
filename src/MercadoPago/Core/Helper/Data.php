@@ -3,6 +3,7 @@
 namespace MercadoPago\Core\Helper;
 
 use Magento\Framework\View\LayoutFactory;
+use MercadoPago\SDK;
 
 
 /**
@@ -85,18 +86,11 @@ class Data
 
 
     /**
-     *api platform openplatform
-     */
-    const PLATFORM_OPENPLATFORM = 'openplatform';
-    /**
-     *api platform stdplatform
-     */
-    const PLATFORM_STD = 'std';
-    /**
-     *type
+     *Platform constants
      */
     const TYPE = 'magento';
-    //end const platform
+    const PLATFORM_V1_WHITELABEL = 'v1-whitelabel';
+    const PLATFORM_DESKTOP = 'Desktop';
 
     /**
      * payment calculator
@@ -132,10 +126,16 @@ class Data
     protected $_orderFactory;
 
     /**
+     * @var \Magento\Framework\Module\ModuleListInterface
+     */
+    protected $_moduleList;
+
+    /**
      * @var \Magento\Backend\Block\Store\Switcher
      */
     protected $_switcher;
     protected $_composerInformation;
+    protected $_config;
 
     /**
      * Data constructor.
@@ -164,8 +164,8 @@ class Data
         \Magento\Sales\Model\ResourceModel\Status\Collection $statusFactory,
         \Magento\Sales\Model\OrderFactory $orderFactory,
         \Magento\Backend\Block\Store\Switcher $switcher,
-        \Magento\Framework\Composer\ComposerInformation $composerInformation
-
+        \Magento\Framework\Composer\ComposerInformation $composerInformation,
+        \Magento\Framework\Module\ModuleListInterface $moduleList
     )
     {
         parent::__construct($context, $layoutFactory, $paymentMethodFactory, $appEmulation, $paymentConfig, $initialConfig);
@@ -176,6 +176,7 @@ class Data
         $this->_orderFactory = $orderFactory;
         $this->_switcher = $switcher;
         $this->_composerInformation = $composerInformation;
+        $this->_moduleList = $moduleList;
     }
 
     /**
@@ -218,14 +219,15 @@ class Data
         if (empty($params)) {
             return;
         }
+
         $type = self::TYPE . ' ' . (string)$this->_moduleList->getOne('MercadoPago_Core')['setup_version'];
         if ($params == 1) {
             $this->_config->set('ACCESS_TOKEN', func_get_arg(0));
-            \MercadoPago\Sdk::addCustomHeader('x-tracking-id', 'platform:' . self::PLATFORM_V1_WHITELABEL . ',type:' . $type . ',so;');
+            \MercadoPago\Sdk::addCustomTrackingParam('x-tracking-id', 'platform:' . self::PLATFORM_V1_WHITELABEL . ',type:' . $type . ',so;');
         } else {
             $this->_config->set('CLIENT_ID', func_get_arg(0));
             $this->_config->set('CLIENT_SECRET', func_get_arg(1));
-            \MercadoPago\Sdk::addCustomHeader('x-tracking-id', 'platform:' . self::PLATFORM_DESKTOP . ',type:' . $type . ',so;');
+            \MercadoPago\Sdk::addCustomTrackingParam('x-tracking-id', 'platform:' . self::PLATFORM_DESKTOP . ',type:' . $type . ',so;');
         }
 
     }
@@ -240,17 +242,14 @@ class Data
      */
     public function isValidAccessToken($accessToken)
     {
-        $mp = $this->getApiInstance($accessToken);
-        try {
-            $response = $mp->get("/v1/payment_methods");
-            if ($response['status'] == 401 || $response['status'] == 400) {
-                return false;
-            }
-
-            return true;
-        } catch (\Exception $e) {
+        $this->getApiInstance($accessToken);
+        $response = \MercadoPago\Sdk::get("/v1/payment_methods");
+        if ($response['code'] == 401 || $response['code'] == 400) {
             return false;
         }
+        $this->_config->set('ACCESS_TOKEN', $accessToken);
+
+        return true;
     }
 
     /**
@@ -264,14 +263,10 @@ class Data
      */
     public function isValidClientCredentials($clientId, $clientSecret)
     {
-        $mp = $this->getApiInstance($clientId, $clientSecret);
-        try {
-            $mp->get_access_token();
-        } catch (\Exception $e) {
-            return false;
-        }
+        $this->getApiInstance($clientId, $clientSecret);
+        $accessToken = $this->_config->get('ACCESS_TOKEN');
 
-        return true;
+        return !empty($accessToken);
     }
 
     /**
@@ -285,15 +280,13 @@ class Data
      */
     public function getAccessToken($scopeCode = null)
     {
-        $clientId = $this->scopeConfig->getValue(self::XML_PATH_CLIENT_ID, \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE, $scopeCode);
-        $clientSecret = $this->scopeConfig->getValue(self::XML_PATH_CLIENT_SECRET, \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE, $scopeCode);
-        try {
-            $accessToken = $this->getApiInstance($clientId, $clientSecret)->get_access_token();
-        } catch (\Exception $e) {
-            $accessToken = false;
+        $clientId = $this->scopeConfig->getValue(self::XML_PATH_CLIENT_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $clientSecret = $this->scopeConfig->getValue(self::XML_PATH_CLIENT_SECRET, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        if ($this->isValidClientCredentials($clientId, $clientSecret)) {
+            return $this->_config->get('ACCESS_TOKEN');
+        } else {
+            return false;
         }
-
-        return $accessToken;
     }
 
     /**
@@ -317,7 +310,7 @@ class Data
         $originalAmount = $transactionAmount + $shippingCost;
 
         if ($couponAmount
-            && $this->_scopeConfig->isSetFlag(self::XML_PATH_CONSIDER_DISCOUNT,\Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
+            && $this->scopeConfig->isSetFlag(self::XML_PATH_CONSIDER_DISCOUNT,\Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
             $order->setDiscountCouponAmount($couponAmount * -1);
             $order->setBaseDiscountCouponAmount($couponAmount * -1);
         }
@@ -457,9 +450,9 @@ class Data
      */
     public function getMercadoPagoPaymentMethods($accessToken)
     {
-        $mp = $this->getApiInstance($accessToken);
+        $this->getApiInstance($accessToken);
         try {
-            $response = $mp->get("/v1/payment_methods");
+            $response = \MercadoPago\sdk::get("/v1/payment_methods");
             if ($response['status'] == 401 || $response['status'] == 400) {
                 return false;
             }
@@ -467,7 +460,7 @@ class Data
             return false;
         }
         
-        return $response['response'];
+        return $response['body'];
     }
 
     public function getModuleVersion()

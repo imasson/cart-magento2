@@ -86,8 +86,8 @@ class OrderUpdate
 
                     $response = $this->_core->getMerchantOrder($merchantOrderId);
 
-                    if ($response['status'] == 201 || $response['status'] == 200) {
-                        $merchantOrderData = $response['response'];
+                    if ($response['code'] == 201 || $response['code'] == 200) {
+                        $merchantOrderData = $response['body'];
 
                         $paymentData = $this->getDataPayments($merchantOrderData);
                         $statusFinal = $this->_statusHelper->getStatusFinal($paymentData['status'], $merchantOrderData);
@@ -148,10 +148,10 @@ class OrderUpdate
     protected function getFormattedPaymentData($paymentId, $data = [])
     {
         $response = $this->_core->getPayment($paymentId);
-        if ($response['status'] == 400 || $response['status'] == 401) {
+        if ($response['code'] == 400 || $response['code'] == 401) {
             return [];
         }
-        $payment = $response['response']['collection'];
+        $payment = $response['body']['collection'];
 
         return $this->_statusHelper->formatArrayPayment($data, $payment, self::LOG_FILE);
     }

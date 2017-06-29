@@ -378,7 +378,8 @@ class StatusUpdate
             "coupon_amount",
             "installments",
             "shipping_cost",
-            "amount_refunded"
+            "amount_refunded",
+            "transaction_details"
         ];
 
         foreach ($fields as $field) {

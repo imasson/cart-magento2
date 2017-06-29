@@ -79,11 +79,11 @@ class Coupon
         } else {
             $response = $this->getArrayErrorResponse();
         }
-        if ($response['status'] != 200 && $response['status'] != 201) {
+        if ($response['code'] != 200 && $response['code'] != 201) {
             $response = $this->getArrayErrorResponse();
         }
         //save value to DiscountCoupon collect
-        $this->_registry->register('mercadopago_discount_amount', (float)$response['response']['coupon_amount']);
+        $this->_registry->register('mercadopago_discount_amount', (float)$response['body']['coupon_amount']);
         $quote = $this->_checkoutSession->getQuote();
         $this->quoteRepository->save($quote->collectTotals());
         $jsonData = json_encode($response);

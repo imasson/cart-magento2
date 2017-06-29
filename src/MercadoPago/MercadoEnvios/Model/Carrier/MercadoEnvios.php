@@ -131,23 +131,25 @@ class MercadoEnvios
             $clientId = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_CLIENT_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $clientSecret = $this->_scopeConfig->getValue(\MercadoPago\Core\Helper\Data::XML_PATH_CLIENT_SECRET, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 
-            $mp = $this->_mpHelper->getApiInstance($clientId, $clientSecret);
+            $this->_mpHelper->getApiInstance($clientId, $clientSecret);
+            $at = \MercadoPago\Sdk::config()->get('ACCESS_TOKEN');
 
             $params = [
                 "dimensions" => $dimensions,
                 "zip_code"   => $postcode,
+                'access_token' => $at
             ];
 
             $freeMethod = $this->_helperCarrierData->getFreeMethod($this->_request);
             if (!empty($freeMethod)) {
                 $params['free_method'] = $freeMethod;
             }
-            $response = $mp->get("/shipping_options", $params);
-            if ($response['status'] == 200) {
-                $this->_methods = $response['response']['options'];
+            $response = \MercadoPago\Sdk::get("/shipping_options", $params);
+            if ($response['code'] == 200) {
+                $this->_methods = $response['body']['options'];
             } else {
-                if (isset($response['response']['message'])) {
-                    $this->_registry->register('mercadoenvios_msg', $response['response']['message']);
+                if (isset($response['body']['message'])) {
+                    $this->_registry->register('mercadoenvios_msg', $response['body']['message']);
                 }
                 $this->_methods = self::INVALID_METHOD;
                 $this->_helperCarrierData->log('Request params: ', $params);
