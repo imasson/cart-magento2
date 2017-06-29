@@ -453,7 +453,7 @@ class Data
         $this->getApiInstance($accessToken);
         try {
             $response = \MercadoPago\sdk::get("/v1/payment_methods");
-            if ($response['status'] == 401 || $response['status'] == 400) {
+            if ($response['code'] == 401 || $response['code'] == 400) {
                 return false;
             }
         } catch (\Exception $e) {

@@ -46,7 +46,7 @@ class Pay
         $standard = $this->_paymentFactory->create();
         $array_assign = $standard->postPago();
         $resultRedirect = $this->resultRedirectFactory->create();
-        if ($array_assign['status'] != 400) {
+        if ($array_assign['code'] != 400) {
             $resultRedirect->setUrl($array_assign['init_point']);
         } else {
             $typeCheckout = $this->_scopeConfig->getValue('payment/mercadopago_standard/type_checkout', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);

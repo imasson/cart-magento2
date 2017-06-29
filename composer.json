@@ -19,13 +19,13 @@
       "url": "https://repo.magento.com/"
     },
     {
-      "type": "path",
-      "url": "/var/www/px-php"
+      "type": "vcs",
+      "url": "http://github.com/mercadopago/px-php"
     }
   ],
   "require": {
     "magento/magento-composer-installer": "*",
-    "mercadopago/px-php": "dev-develop"
+    "mercadopago/px-php": "*"
   },
   "require-dev": {
     "magento/product-community-edition": "2.*",

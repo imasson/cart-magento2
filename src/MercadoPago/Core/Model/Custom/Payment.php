@@ -595,7 +595,7 @@ class Payment
 
         $this->_helperData->log("Response create card", self::LOG_NAME, $response);
 
-        if ($response['status'] == 201) {
+        if ($response['code'] == 201) {
             return $response['body'];
         }
 
