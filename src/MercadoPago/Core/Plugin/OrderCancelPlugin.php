@@ -82,7 +82,6 @@ class OrderCancelPlugin
                 $accessToken = $this->_scopeConfig->getValue(\MercadoPago\Core\Model\Core::XML_PATH_ACCESS_TOKEN, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
                 $params = [
                     'json_data'  => ['status' => 'cancelled'],
-                    'url_params' => ['access_token' => $accessToken],
                     'uri'        => '/collections/' . $paymentID
                 ];
 
@@ -93,9 +92,9 @@ class OrderCancelPlugin
                 } else {
                     $this->dataHelper->getApiInstance($accessToken);
                     $data = [
-                        "status" => 'cancelled'
+                        'json_data' => ["status" => 'cancelled']
                     ];
-                    $response = \MercadoPago\Sdk::put("/v1/payments/$paymentID?access_token=$accessToken", $data);
+                    $response = \MercadoPago\Sdk::put("/v1/payments/$paymentID", $data);
                 }
 
                 if ($response['code'] == 200) {

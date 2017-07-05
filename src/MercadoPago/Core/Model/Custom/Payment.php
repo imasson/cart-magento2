@@ -581,17 +581,16 @@ class Payment
                 return $card;
             }
         }
-        $params = ["token" => $token];
+        $params = [
+            'json_data' => ["token" => $token]
+        ];
         if (isset($payment['issuer_id'])) {
-            $params['issuer_id'] = (int)$payment['issuer_id'];
+            $params['json_data']['issuer_id'] = (int)$payment['issuer_id'];
         }
         if (isset($payment['payment_method_id'])) {
-            $params['payment_method_id'] = $payment['payment_method_id'];
+            $params['json_data']['payment_method_id'] = $payment['payment_method_id'];
         }
-        //$card = $mp->post("/v1/customers/" . $customer['id'] . "/cards", $params);
-        $mpCard = new \MercadoPago\Card($params);
-        $mpCard->customer_id = $customer->id;
-        $response = $mpCard->save();
+        $response = \MercadoPago\SDK::post ("/v1/customers/".$customer->id."/cards", $params);
 
         $this->_helperData->log("Response create card", self::LOG_NAME, $response);
 

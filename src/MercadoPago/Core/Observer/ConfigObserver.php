@@ -415,7 +415,7 @@ class ConfigObserver
 
         $this->coreHelper->log("Analytics settings request sent /modules/tracking/settings", self::LOG_NAME, $request);
 
-        $response = \MercadoPago\Sdk::post("/modules/tracking/settings", $request['data']);
+        $response = \MercadoPago\Sdk::post("/modules/tracking/settings", ['json_data' => $request['data']]);
         $this->coreHelper->log("Analytics settings response", self::LOG_NAME, $response);
 
     }
