@@ -105,6 +105,7 @@ class Standard
     public function execute()
     {
         $request = $this->getRequest();
+        $request = $this->getRequest();
         //notification received
         $this->coreHelper->log("Standard Received notification", self::LOG_NAME, $request->getParams());
 
